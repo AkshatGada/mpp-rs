@@ -1,15 +1,13 @@
 //! Tempo API MPP relay adapter.
 
-use alloy::primitives::keccak256;
 use reqwest::{Client, Url};
 use serde::{Deserialize, Serialize};
-use sha2::{Digest, Sha256};
 use time::format_description::well_known::Rfc3339;
 
 use crate::error::MppError;
 use crate::protocol::core::{PaymentCredential, Receipt, ReceiptStatus};
 use crate::protocol::intents::ChargeRequest;
-use crate::protocol::traits::{ChargeValidation, VerificationError};
+use crate::protocol::traits::{ChargeValidation, ErrorCode, VerificationError};
 
 const DEFAULT_API_BASE_URL: &str = "https://api.tempo.xyz";
 
@@ -163,7 +161,7 @@ impl Relay {
         request: &ChargeRequest,
     ) -> Result<ChargeValidation, VerificationError> {
         let input = RelayInput::try_from(credential)?;
-        let response = self.post("v1/mpp/validate", &input, None).await?;
+        let response = self.post("v1/mpp/validate", &input).await?;
         if !is_success(&response) {
             return Err(failure(Some(&response)));
         }
@@ -181,15 +179,33 @@ impl Relay {
         expected_method: &str,
     ) -> Result<Receipt, VerificationError> {
         let input = RelayInput::try_from(credential)?;
-        let key = idempotency_key(&input)?;
-        let broadcast = self.post("v1/mpp/broadcast", &input, Some(&key)).await?;
+        // Cached settlement receipts must not authorize another protected operation.
+        // The relay consumes the credential once. Ambiguous results require
+        // operation-bound reconciliation; they must not invite another payment.
+        let broadcast = self.post("v1/mpp/broadcast", &input).await?;
+        if broadcast
+            .get("success")
+            .and_then(serde_json::Value::as_bool)
+            .is_none()
+        {
+            return Err(outcome_unknown());
+        }
+        if !is_success(&broadcast) {
+            return Err(
+                if relay_error_code(&broadcast) == Some(RelayErrorCode::TemporarilyUnavailable) {
+                    outcome_unknown()
+                } else {
+                    failure(Some(&broadcast))
+                },
+            );
+        }
         let response: BroadcastSuccess =
-            serde_json::from_value(broadcast.clone()).map_err(|_| failure(Some(&broadcast)))?;
+            serde_json::from_value(broadcast.clone()).map_err(|_| outcome_unknown())?;
         if !response.success || response.receipt.method != expected_method {
-            return Err(failure(Some(&broadcast)));
+            return Err(outcome_unknown());
         }
         time::OffsetDateTime::parse(&response.receipt.timestamp, &Rfc3339)
-            .map_err(|_| failure(Some(&broadcast)))?;
+            .map_err(|_| outcome_unknown())?;
 
         Ok(Receipt {
             status: ReceiptStatus::Success,
@@ -206,30 +222,47 @@ impl Relay {
         &self,
         path: &str,
         input: &RelayInput<'_>,
-        idempotency_key: Option<&str>,
     ) -> Result<serde_json::Value, VerificationError> {
         let url = self.api_base_url.join(path).map_err(|_| failure(None))?;
-        let mut request = self
+        let request = self
             .client
             .post(url)
             .header(reqwest::header::ACCEPT, "application/json")
             .header("tempo-api-key", &self.api_key)
             .json(input);
-        if let Some(idempotency_key) = idempotency_key {
-            request = request.header("idempotency-key", idempotency_key);
-        }
 
-        let response = request.send().await.map_err(|_| unavailable())?;
+        // Scope transport idempotency to this attempt, never to a reusable credential.
+        // Override custom-client defaults without relying on empty-header semantics.
+        let request = if path == "v1/mpp/broadcast" {
+            request.header("idempotency-key", uuid::Uuid::new_v4().to_string())
+        } else {
+            request
+        };
+        let broadcast = path == "v1/mpp/broadcast";
+        let response = request.send().await.map_err(|error| {
+            if broadcast && !error.is_connect() {
+                outcome_unknown()
+            } else {
+                unavailable()
+            }
+        })?;
         if response.status().is_server_error() {
-            return Err(unavailable());
+            return Err(if broadcast {
+                outcome_unknown()
+            } else {
+                unavailable()
+            });
         }
         if !response.status().is_success() {
             return Err(failure(None));
         }
-        response
-            .json::<serde_json::Value>()
-            .await
-            .map_err(|_| failure(None))
+        response.json::<serde_json::Value>().await.map_err(|_| {
+            if broadcast {
+                outcome_unknown()
+            } else {
+                failure(None)
+            }
+        })
     }
 }
 
@@ -330,33 +363,19 @@ fn failure(value: Option<&serde_json::Value>) -> VerificationError {
     }
 }
 
+/// Settlement may have consumed the credential. Neither retry it nor invite
+/// another payment until the original operation is reconciled.
+fn outcome_unknown() -> VerificationError {
+    VerificationError::with_code(
+        "Tempo API relay payment outcome unknown; reconciliation required",
+        ErrorCode::NetworkError,
+    )
+}
+
 /// The relay could not be reached or could not serve the request: a
 /// server-side failure, not a rejection of the credential.
 fn unavailable() -> VerificationError {
     VerificationError::network_error("Tempo API relay temporarily unavailable")
-}
-
-fn idempotency_key(input: &RelayInput<'_>) -> Result<String, VerificationError> {
-    if input
-        .payload
-        .get("type")
-        .and_then(serde_json::Value::as_str)
-        == Some("transaction")
-    {
-        if let Some(signature) = input
-            .payload
-            .get("signature")
-            .and_then(serde_json::Value::as_str)
-        {
-            if let Ok(bytes) = hex::decode(signature.strip_prefix("0x").unwrap_or(signature)) {
-                return Ok(format!("mppx_{:#x}", keccak256(bytes)));
-            }
-        }
-    }
-
-    let canonical = serde_json_canonicalizer::to_string(input).map_err(|_| failure(None))?;
-    let digest = Sha256::digest(canonical.as_bytes());
-    Ok(format!("mppx_0x{}", hex::encode(digest)))
 }
 
 #[cfg(test)]
@@ -441,35 +460,42 @@ mod tests {
         )
     }
 
-    #[test]
-    fn transaction_idempotency_key_uses_transaction_hash() {
+    #[tokio::test]
+    async fn concurrent_broadcasts_do_not_reuse_cached_receipts() {
+        let consumed = Arc::new(std::sync::Mutex::new(None::<String>));
+        let app = Router::new().route("/v1/mpp/broadcast", post(move |headers: HeaderMap| {
+            let consumed = consumed.clone();
+            async move {
+                let key = headers.get("idempotency-key").unwrap().to_str().unwrap();
+                assert_ne!(key, "shared-key");
+                assert!(uuid::Uuid::parse_str(key).is_ok());
+                let mut consumed = consumed.lock().unwrap();
+                if consumed.as_deref().is_some_and(|previous| previous != key) {
+                    return Json(serde_json::json!({"success": false, "error": {"code": "already_used", "message": "Used"}}));
+                }
+                *consumed = Some(key.to_string());
+                Json(serde_json::json!({"success": true, "receipt": {"method": "tempo", "reference": "0xabc", "timestamp": "2026-08-03T12:00:00Z"}}))
+            }
+        }));
+        let listener = tokio::net::TcpListener::bind("127.0.0.1:0").await.unwrap();
+        let address = listener.local_addr().unwrap();
+        let server = tokio::spawn(async move { axum::serve(listener, app).await.unwrap() });
+        let mut headers = HeaderMap::new();
+        headers.insert("idempotency-key", "shared-key".parse().unwrap());
+        let client = Client::builder().default_headers(headers).build().unwrap();
+        let relay = Relay::new(
+            RelayConfig::new("key")
+                .client(client)
+                .api_base_url(format!("http://{address}")),
+        )
+        .unwrap();
         let credential = credential(PaymentPayload::transaction("0x1234"));
-        let input = RelayInput::try_from(&credential).unwrap();
-        assert_eq!(
-            idempotency_key(&input).unwrap(),
-            format!("mppx_{:#x}", keccak256([0x12, 0x34]))
+        let (first, second) = tokio::join!(
+            relay.broadcast(&credential, "tempo"),
+            relay.broadcast(&credential, "tempo")
         );
-    }
-
-    #[test]
-    fn non_transaction_idempotency_key_is_canonical_and_deterministic() {
-        let credential = credential(PaymentPayload::hash("0x1234"));
-        let input = RelayInput::try_from(&credential).unwrap();
-        let first = idempotency_key(&input).unwrap();
-        let second = idempotency_key(&input).unwrap();
-        assert_eq!(first, second);
-        assert!(first.starts_with("mppx_0x"));
-        assert_eq!(first.len(), "mppx_0x".len() + 64);
-    }
-
-    #[test]
-    fn invalid_transaction_signature_uses_canonical_idempotency_fallback() {
-        let credential = credential(PaymentPayload::transaction("not-hex"));
-        let input = RelayInput::try_from(&credential).unwrap();
-        let key = idempotency_key(&input).unwrap();
-
-        assert!(key.starts_with("mppx_0x"));
-        assert_eq!(key.len(), "mppx_0x".len() + 64);
+        server.abort();
+        assert_ne!(first.is_ok(), second.is_ok());
     }
 
     #[test]
@@ -632,9 +658,8 @@ mod tests {
             assert_eq!(call.body["source"], "did:pkh:eip155:42431:0x1234");
         }
         assert!(calls[0].headers.get("idempotency-key").is_none());
-        assert_eq!(
-            calls[1].headers["idempotency-key"],
-            format!("mppx_{:#x}", keccak256([0x12, 0x34]))
+        assert!(
+            uuid::Uuid::parse_str(calls[1].headers["idempotency-key"].to_str().unwrap()).is_ok()
         );
     }
 
@@ -869,6 +894,59 @@ mod tests {
     }
 
     #[tokio::test]
+    async fn broadcast_uncertain_outcomes_never_advertise_retry() {
+        for (status, body) in [
+            (StatusCode::BAD_GATEWAY, serde_json::json!({})),
+            (StatusCode::OK, serde_json::json!({})),
+            (
+                StatusCode::OK,
+                serde_json::json!({"success": false, "error": {"code": "temporarily_unavailable"}}),
+            ),
+            (StatusCode::OK, serde_json::json!({"success": true})),
+        ] {
+            let (url, _) = spawn_relay([(status, body)]).await;
+            let relay = Relay::new(RelayConfig::new("secret").api_base_url(url)).unwrap();
+            let error = relay
+                .broadcast(&credential(PaymentPayload::transaction("0x1234")), "tempo")
+                .await
+                .unwrap_err();
+            assert_eq!(error.code, Some(ErrorCode::NetworkError));
+            assert!(!error.retryable);
+            assert!(error.message.contains("outcome unknown"));
+        }
+    }
+
+    #[tokio::test]
+    async fn broadcast_response_loss_requires_reconciliation() {
+        for malformed_body in [false, true] {
+            let listener = tokio::net::TcpListener::bind("127.0.0.1:0").await.unwrap();
+            let url = format!("http://{}", listener.local_addr().unwrap());
+            let server = tokio::spawn(async move {
+                let (mut socket, _) = listener.accept().await.unwrap();
+                let mut bytes = [0; 4096];
+                assert!(socket.read(&mut bytes).await.unwrap() > 0);
+                if malformed_body {
+                    socket
+                        .write_all(
+                            b"HTTP/1.1 200 OK\r\nContent-Length: 1\r\nConnection: close\r\n\r\n{",
+                        )
+                        .await
+                        .unwrap();
+                }
+            });
+            let relay = Relay::new(RelayConfig::new("key").api_base_url(url)).unwrap();
+            let error = relay
+                .broadcast(&credential(PaymentPayload::transaction("0x1234")), "tempo")
+                .await
+                .unwrap_err();
+            server.await.unwrap();
+            assert_eq!(error.code, Some(ErrorCode::NetworkError));
+            assert!(!error.retryable);
+            assert!(error.message.contains("outcome unknown"));
+        }
+    }
+
+    #[tokio::test]
     async fn relay_rejects_invalid_receipts() {
         for receipt in [
             serde_json::json!({
@@ -896,7 +974,8 @@ mod tests {
                 .broadcast(&credential(PaymentPayload::transaction("0x1234")), "tempo")
                 .await
                 .unwrap_err();
-            assert_eq!(error.message, "Tempo API relay rejected credential");
+            assert_eq!(error.code, Some(ErrorCode::NetworkError));
+            assert!(!error.retryable);
             let calls = calls.lock().unwrap();
             assert_eq!(calls.len(), 1);
             assert_eq!(calls[0].path, "/v1/mpp/broadcast");
