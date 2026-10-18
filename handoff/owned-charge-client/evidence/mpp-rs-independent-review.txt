@@ -1,0 +1,36 @@
+Independent source review, 18 October 2026
+
+Reviewer identity: /root/independent_review, a fresh subagent explicitly
+authorized by Akshat for this review. Review was read-only; no Cargo executions,
+source edits, external messages or subdelegation were performed by the reviewer.
+
+Admission/start evidence: reviewer reported reading AGENTS.md and
+src/client/charge_client.rs from disk and verifying the six-file working-tree
+scope before reporting that review had started. It subsequently inspected the
+actual diff, full tests, shared flow, Accept-Payment selector/parser/ranker,
+provider lifecycle, Fetch, direct session guards, protocol header binding, and
+reqwest 0.13.5 client execution and redirect source.
+
+Original finding (P2): ChargeClient compared allowed credential header names
+case-sensitively. The protocol accepts and preserves lowercase/mixed-case
+Payment-Authorization spellings, so valid offers were rejected before payment.
+This was a source-verified correctness defect, not a live payment observation.
+
+Parent fix: compare both allowed header names using eq_ignore_ascii_case,
+without rewriting the challenge's spelling or its echo/HMAC-bound fields.
+The new loopback test covers lowercase and mixed-case headers for initial and
+prepared offers and asserts that credential echo spelling is preserved.
+
+Reviewer also recommended ordinary Authorization success and provider refresh
+coverage. Parent added both: ordinary charge success asserts that no custom
+credential is sent; refresh tests assert request/preparation/payment counts,
+only pay the fresh challenge, and verify zero redirect-target contacts.
+
+Final rereview evidence: reviewer read updated source and all three added tests
+from disk and reported the P2 resolved, no new actionable issue, and no outstanding
+findings in the final six-file scope. The reviewer distinguished its source
+review from parent-run execution and feature-matrix evidence.
+
+This is independent agent review, not maintainer approval or a guarantee of
+absence of defects. The parent owns the compatibility/test evidence recorded
+separately. No publication is authorized or claimed.

@@ -1,0 +1,160 @@
+mpp-rs independent review, compatibility gates and local PR preparation
+18 October 2026
+
+FINAL STATUS
+Local review and PR preparation complete. No publication is authorized.
+Six-file patch remains uncommitted on main in /Users/akshat/mpp-rs.
+No branch creation, commit, push, upstream PR, CLA acceptance, outreach,
+live payment, production edit, Excel edit or other-project-session edit occurred.
+This record supersedes the earlier preliminary validation counts of 111/113.
+
+BASE AND CURRENT OVERLAP
+Local HEAD and public upstream main, rechecked at the end:
+473b29962bd1393076c146a411e5a6ea9e3b6ac7.
+Origin: https://github.com/AkshatGada/mpp-rs.git, verified fork of tempoxyz/mpp-rs.
+PR #560 remains merged (7 October 2026); its caller-owned HTTP transport guard
+is deliberately retained. PR #574 remains open at
+46a566bba7b3f2df910d100808ed227618a9f602. Public open PR scope is unchanged.
+Sources:
+https://github.com/tempoxyz/mpp-rs/pull/560
+https://github.com/tempoxyz/mpp-rs/pull/574
+The first investigation separately confirmed #573's supplied session HTTP
+client and #305's protocol-only EVM work do not implement this owned client.
+No claim about private maintainer plans or acceptance is made.
+
+INDEPENDENT REVIEW AND FIX
+Fresh, explicitly authorized reviewer: /root/independent_review.
+It acknowledged source reads before review was reported as running, reviewed
+the actual diff and all untracked source/tests, and made no edits or Cargo runs.
+One actionable P2 finding: case-sensitive credential-header admission rejected
+valid lowercase/mixed-case Payment-Authorization offers accepted by the protocol.
+Fixed by eq_ignore_ascii_case without rewriting bound challenge/echo spelling.
+Added casing tests for initial/prepared offers and the two recommended coverage
+cases: ordinary Authorization success and provider refresh/redirect behavior.
+Reviewer reread the final source and tests and reported no outstanding findings.
+This is independent agent source review, not maintainer approval.
+Detailed report: /private/tmp/mpp-rs-independent-review.txt.
+
+FINAL DESIGN AND SCOPE
+ChargeClient owns a private reqwest client, accepts only ClientBuilder, and
+applies Policy::none() last. Both initial and paid requests execute through that
+retained client even when supplied a builder from a different client.
+Valid request-level Accept-Payment is required; opaque defaults cannot authorize
+payment. Invalid, repeated and all-zero values fail closed. Charge-only offers
+are filtered before preparation. Selected/prepared offers are rechecked for
+transport limits, provider support, request preferences and expiry.
+The shared flow retains ranking, fallback, body cloning and retry limits.
+API Authorization survives custom-header payment. Redirects are returned without
+following Location. No session management transport is supplied, and no session,
+top-up, voucher or close API is added. Legacy guards remain.
+
+Files:
+README.md
+src/client/mod.rs
+src/client/flow.rs
+src/client/charge_client.rs
+src/client/charge_client/tests.rs
+.changelog/redirect-safe-charge-client.md
+No dependency declaration or generated file changed. This turn's source change
+was the reviewed casing fix plus three meaningful regression tests, not an API
+or architecture redesign.
+
+TOOLCHAIN AND DEPENDENCIES
+Earlier minimal-feature tests used Cargo/rustc 1.94.1. Those results did not
+establish Tempo compatibility. Installed Rust 1.98.0 and Cargo 1.98.0 were used
+for all broader gates below. Tempo alloy/primitives/contracts 1.11.0 explicitly
+declare rust-version 1.95.0; 1.98 satisfies that declared requirement. Exact 1.95
+execution is not claimed. No global toolchain or PATH configuration was changed.
+
+The repository .github/scripts/resolve-cargo-dependencies.sh completed using 1.98.
+It changed only ignored Cargo.lock/cache, applying the CI transitive-version
+pins. Log: /private/tmp/mpp-rs-resolve-ci.log.
+The previous local lock was preserved at
+/private/tmp/mpp-rs-lock-before-compatibility.
+Dependency download occurred during setup; subsequent gates used --offline.
+Cargo-hack 0.6.45 was installed only in /private/tmp/mpp-rs-tools.
+
+EXACT COMPATIBILITY GATES AND RESULTS
+Commands below used PATH with
+/Users/akshat/.rustup/toolchains/1.98.0-aarch64-apple-darwin/bin prepended.
+
+1. Strict workspace lint: PASS, exit 0, no dead-code allowance.
+cargo clippy --workspace --all-targets --all-features -- -D warnings
+Log: /private/tmp/mpp-rs-clippy-workspace.log
+This compiled every workspace target, including examples, transport and
+integration test targets; compilation does not execute on-chain integration.
+
+2. CI-style feature matrix: PASS, all 127 configurations, exit 0.
+cargo hack check --offline --feature-powerset --depth 2 --no-dev-deps --skip integration,integration-stripe,integration-ws
+Log: /private/tmp/mpp-rs-feature-matrix.log
+Executed on a source-identical temporary workspace because --no-dev-deps
+temporarily edits Cargo.toml. It did not modify the user's manifest. This is the
+repository CI depth-two matrix, not the full mathematical powerset. Conditional
+unused-code/import warnings occur in unchanged source under narrow features;
+the CI check permits these. Full-feature strict Clippy passed separately.
+
+3. Workspace tests and doctests: PASS, exit 0.
+env -u STRIPE_SECRET_KEY -u TEMPO_RPC_URL cargo test --offline --workspace --features tempo,stripe,ws,server,client,axum,middleware,tower,utils,sqlite,integration-stripe,integration-ws -- --skip test_live_stripe --test-threads=2
+Log: /private/tmp/mpp-rs-workspace-tests.log
+Aggregate: 1,612 passed, zero failed, 48 ignored, two filtered.
+Breakdown: 1,461 main-library tests; 24 Alloy transport library tests; seven
+application-WebSocket tests; 31 WebSocket transport integration tests; 13 mock
+Stripe tests; five MPP WebSocket tests; one Problem Details test; three Tower
+tests; three session-example server tests; 64 main-crate doctests.
+All 11 ChargeClient regression tests ran and passed.
+Ignored: 44 main-crate doctests, three Alloy transport doctests, one opt-in
+physical Node/Rust SQLite handoff. The two real Stripe tests were explicitly
+filtered regardless of credential availability. On-chain integration feature
+was not enabled, so chain charge/session integration files executed zero tests.
+
+4. Strict main-crate documentation: PASS, exit 0.
+RUSTDOCFLAGS='--cfg docsrs -D warnings' cargo doc --offline --no-deps --all-features
+Log: /private/tmp/mpp-rs-docs.log
+
+5. Workspace examples/transport under their normal feature graph: PASS, exit 0.
+cargo check --offline --workspace --exclude mpp
+Log: /private/tmp/mpp-rs-examples-check.log
+
+6. Ring-only transport graph: PASS; no aws-lc-sys normal dependency.
+cargo tree --offline -p alloy-transport-mpp --no-default-features --features ring --edges normal --prefix none
+Tree: /private/tmp/mpp-rs-ring-tree.txt
+
+7. Current #574 combined-source compatibility: PASS, 1,467 library tests, exit 0.
+The full PR diff and the local patch applied cleanly. Final reviewed ChargeClient
+source/tests and the CI-resolved lock were copied into that combined workspace.
+env -u STRIPE_SECRET_KEY -u TEMPO_RPC_URL cargo test --offline --lib --features tempo,stripe,ws,server,client,axum,middleware,tower,utils,sqlite -- --test-threads=2
+Log: /private/tmp/mpp-rs-574-reviewed-tests.log
+This is a full library-feature test run, stronger than the earlier 113-test
+minimal-feature check. It does not execute live settlement or prove that every
+upstream PR concern is resolved.
+
+8. cargo fmt --all -- --check and git diff --check: PASS.
+
+NEW REGRESSION COVERAGE
+20 redirect cases: same/cross origin x initial/paid x 301/302/303/307/308.
+Redirect targets receive zero requests, including when constructor/request
+builders originally followed redirects. Other tests cover preserved API auth
+and POST body replay, ordinary Authorization charge success, lowercase/mixed-case
+header spelling in initial/prepared offers, session/unsupported-offer filtering
+and charge fallback, prepared session/unsupported/opted-out/expired replacements,
+missing/malformed/repeated/all-zero preferences and opaque client defaults,
+method q=0 alongside positive alternatives, incremental/repeated challenge caps,
+provider-requested challenge refresh plus unfollowed refresh redirect, and
+unchallenged/challenged noncloneable bodies.
+
+PR PREPARATION AND REPRODUCIBLE ARTIFACTS
+Title/body draft: /private/tmp/mpp-rs-pr-draft.txt
+Six-file patch: /private/tmp/mpp-rs-reviewed-charge-client.patch
+Source and patch hashes: /private/tmp/mpp-rs-reviewed-source-sha256.json
+The six source hashes still matched after all checks; no newer user edit was
+overwritten. Logs and reports are outside the repository and not in the patch.
+Patch retains the repository MIT OR Apache-2.0 contribution terms. No CLA action
+was taken. No GitHub PR or branch has been created.
+
+REMAINING LIMITATIONS
+Native macOS Rust 1.98 was tested; exact 1.95 and cross-platform builds were not.
+No live payment, on-chain settlement, physical Node/Rust SQLite handoff, fuzz
+campaign, dependency/security service, GitHub Actions run or maintainer review
+was performed. These local gates must not be described as full upstream CI,
+approval, merge or production evidence. Integration should be coordinated with
+#574's eventual explicit-payment and lifecycle implementation.

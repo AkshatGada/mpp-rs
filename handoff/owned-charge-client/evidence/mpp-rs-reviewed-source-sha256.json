@@ -1,0 +1,10 @@
+{
+  "README.md": "808992c26c473fc1233a789e8ff25c11be155d036ba852b743b3a66d7c90eed5",
+  "src/client/mod.rs": "0673d6c1ef4804b6e98d0aeda83778b34d7562bee0208c0c7463979e47236f5e",
+  "src/client/flow.rs": "a19f4e9808dde1dc3b57e6c87330caf9c749b87e67a138afcf4fd83ec51e8caa",
+  "src/client/charge_client.rs": "0fb75530f125cdd4127b41f4959692ea96874bc3de722a1cb97c51d9cc5370c0",
+  "src/client/charge_client/tests.rs": "88be97db1bac358880f15cb5232d461675e94150360e011952357fd50c70166a",
+  ".changelog/redirect-safe-charge-client.md": "95815e6a8d3a816e7268919f9c3d3b33e00376a044394e251bc75d3c35dabdbc",
+  "Cargo.lock (ignored; CI resolved)": "e9a89a1567b6604e1ede0c97e9e5cfef36450d18c09258ed2b9f4be4b44d8b54",
+  "reviewed patch": "315934a989084514c4f1767a6c7e6ee5f929fc3ba6c922322f0499779844bda5"
+}

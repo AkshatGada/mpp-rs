@@ -1,0 +1,57 @@
+Title
+feat(client): add an owned charge client without redirects
+
+Body
+
+Endpoints that use an API credential alongside MPP advertise
+Payment-Authorization. Fetch and PaymentMiddleware reject these offers because
+their caller-owned HTTP clients cannot establish a redirect guarantee.
+
+Add ChargeClient, constructed from ClientBuilder with redirects disabled as the
+final setting. Both the initial request and every paid retry execute through
+its retained private client, preserving ordinary Authorization when the payment
+uses Payment-Authorization. Redirect responses are returned without following
+Location, including redirects to the same origin.
+
+Payment requires a valid request-level Accept-Payment preference. Missing,
+malformed, repeated and all-zero preferences cannot authorize payment; client
+default headers do not authorize it. Filter out session offers before provider
+preparation and recheck selected/prepared challenges against transport limits,
+provider support, request preferences and expiry. Accept valid header casing
+without rewriting the challenge's bound spelling. Retain the existing Fetch,
+middleware and session-management guards.
+
+Validation
+
+- Rust 1.98.0 with dependencies resolved by the repository CI script.
+- Strict Clippy across workspace/all targets/all features passed.
+- CI-style depth-two feature matrix: all 127 configurations passed.
+- Workspace example/transport check (`--workspace --exclude mpp`) passed.
+- Workspace tests: 1,612 passed, including 1,461 main-library tests and 64
+  main-crate doctests; 48 ignored, two live Stripe tests explicitly filtered.
+- Final patch combined with PR #574 head
+  46a566bba7b3f2df910d100808ed227618a9f602: 1,467 library tests passed.
+- Strict all-feature main-crate documentation and Ring-only transport
+  dependency graph checks passed.
+- Loopback regressions cover same/cross-origin 301/302/303/307/308 responses
+  before/after payment, no credential forwarding, both credential headers,
+  preserved API authorization/body, request opt-outs, unsupported-offer
+  filtering/fallback, prepared-challenge constraints, valid header casing,
+  provider refresh, noncloneable bodies and paid retry limits.
+
+Scope and limitations
+
+Charge intents only; no session top-up, voucher or close support is added.
+No dependency is added. Tempo 1.11 declares Rust 1.95; these broader checks ran
+on installed Rust 1.98, not directly on 1.95. Live payments, on-chain integration,
+physical Node/Rust SQLite handoff, fuzzing and upstream CI were not run locally.
+Coordinate integration with #574's explicit-payment and lifecycle changes.
+
+End of PR body
+
+Local preparation status (outside PR body)
+
+Reviewed code was committed as 44018e58bd2706277fc231b4dd51ae868e049af2
+and pushed to AkshatGada/mpp-rs on codex/owned-charge-client. No upstream PR,
+CLA acceptance or outreach has occurred. Final publication is not authorized.
+The detailed compatibility commands and evidence are recorded alongside this draft.

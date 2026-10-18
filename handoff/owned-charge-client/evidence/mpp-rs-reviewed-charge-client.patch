@@ -1,0 +1,954 @@
+diff --git a/README.md b/README.md
+index 527295a..ac3ee3b 100644
+--- a/README.md
++++ b/README.md
+@@ -84,6 +84,25 @@ If the endpoint already uses `Authorization` (API keys, Bearer tokens), create t
+ let mpp = Mpp::create(tempo(config).requires_auth(true))?;
+ ```
+ 
++For charge requests that need both an API credential and `Payment-Authorization`,
++use `ChargeClient`. It owns its HTTP client, disables redirects on initial and
++paid requests, and returns redirect responses without following them. It accepts
++only charge intents; session management remains excluded. Set `Accept-Payment`
++on each request to authorize payment; client default headers do not authorize it.
++
++```rust
++use mpp::client::ChargeClient;
++use reqwest::Method;
++
++let client = ChargeClient::new(reqwest::Client::builder())?;
++let response = client.send_with_payment(
++    client.request(Method::GET, "https://api.example.com/paid")
++        .bearer_auth("api-key")
++        .header("Accept-Payment", "tempo/charge"),
++    &provider,
++).await?;
++```
++
+ ### Client (Tempo)
+ 
+ ```rust
+diff --git a/src/client/flow.rs b/src/client/flow.rs
+index 90acaa1..ef61e63 100644
+--- a/src/client/flow.rs
++++ b/src/client/flow.rs
+@@ -29,6 +29,16 @@ pub(crate) trait Exchange: Send {
+     /// Error of a request that could not be sent.
+     type Error: Display + Send;
+ 
++    /// Restricts offers before provider preparation and after preparation.
++    /// Caller-owned transports cannot safely send custom credential headers.
++    fn check_challenge(&self, challenge: &PaymentChallenge) -> Result<(), HttpError> {
++        if challenge.credential_header() == "Authorization" {
++            Ok(())
++        } else {
++            Err(HttpError::UnsafeCredentialHeader)
++        }
++    }
++
+     /// Caller-configured client available for session management requests.
+     fn http_client(&self) -> Option<reqwest::Client> {
+         None
+@@ -156,24 +166,19 @@ impl<P: PaymentProvider> PaymentFlow<'_, P> {
+                 .collect();
+ 
+             let safe_supported = challenges.iter().any(|challenge| {
+-                challenge.credential_header() == "Authorization"
++                exchange.check_challenge(challenge).is_ok()
+                     && self
+                         .provider
+                         .supports(challenge.method.as_str(), challenge.intent.as_str())
+             });
+             if !safe_supported {
+-                if let Some(unsafe_challenge) = challenges.iter().find(|challenge| {
+-                    challenge.credential_header() != "Authorization"
+-                        && self
+-                            .provider
+-                            .supports(challenge.method.as_str(), challenge.intent.as_str())
++                for challenge in challenges.iter().filter(|challenge| {
++                    self.provider
++                        .supports(challenge.method.as_str(), challenge.intent.as_str())
+                 }) {
+-                    return Err(self
+-                        .fail(
+-                            Some(unsafe_challenge.clone()),
+-                            HttpError::UnsafeCredentialHeader,
+-                        )
+-                        .await);
++                    if let Err(error) = exchange.check_challenge(challenge) {
++                        return Err(self.fail(Some(challenge.clone()), error).await);
++                    }
+                 }
+             }
+ 
+@@ -181,7 +186,7 @@ impl<P: PaymentProvider> PaymentFlow<'_, P> {
+                 &challenges,
+                 ranking_accept.as_deref(),
+                 |challenge| {
+-                    challenge.credential_header() == "Authorization"
++                    exchange.check_challenge(challenge).is_ok()
+                         && self
+                             .provider
+                             .supports(challenge.method.as_str(), challenge.intent.as_str())
+@@ -213,6 +218,13 @@ impl<P: PaymentProvider> PaymentFlow<'_, P> {
+                 }
+             };
+ 
++            // A provider's selector must not bypass transport restrictions.
++            if let Err(error) =
++                self.check_challenge(exchange, &challenge, ranking_accept.as_deref())
++            {
++                return Err(self.fail(Some(challenge), error).await);
++            }
++
+             let challenge = match self
+                 .provider
+                 .prepare_http_payment_challenge(&challenge, payment_context.clone())
+@@ -239,13 +251,12 @@ impl<P: PaymentProvider> PaymentFlow<'_, P> {
+                     return Err(self.fail(Some(challenge), HttpError::Payment(err)).await);
+                 }
+             };
+-            // The caller owns reqwest's redirect policy, which cannot be changed
+-            // for one request. Unlike Authorization, reqwest preserves this
+-            // custom header across origins. Reject before the provider pays.
+-            if challenge.credential_header() != "Authorization" {
+-                return Err(self
+-                    .fail(Some(challenge), HttpError::UnsafeCredentialHeader)
+-                    .await);
++            // Preparation may replace the challenge. Recheck before creating
++            // a credential, including the charge-only owned transport's limit.
++            if let Err(error) =
++                self.check_challenge(exchange, &challenge, ranking_accept.as_deref())
++            {
++                return Err(self.fail(Some(challenge), error).await);
+             }
+             payment_attempt += 1;
+ 
+@@ -381,6 +392,35 @@ impl<P: PaymentProvider> PaymentFlow<'_, P> {
+         Ok(resp)
+     }
+ 
++    /// Neither provider selection nor preparation can expand transport or
++    /// request permissions, or replace an offer with an unsupported/expired one.
++    fn check_challenge<X: Exchange>(
++        &self,
++        exchange: &X,
++        challenge: &PaymentChallenge,
++        ranking_accept: Option<&str>,
++    ) -> Result<(), HttpError> {
++        exchange.check_challenge(challenge)?;
++        select_supported_challenge(
++            std::slice::from_ref(challenge),
++            ranking_accept,
++            |challenge| {
++                self.provider
++                    .supports(challenge.method.as_str(), challenge.intent.as_str())
++            },
++            |candidates| candidates.first().copied(),
++        )
++        .map(|_| ())
++        .map_err(|error| match error {
++            ChallengeSelectionError::Expired(challenge) => {
++                HttpError::Payment(expired_payment_error(&challenge))
++            }
++            ChallengeSelectionError::NoSupportedChallenge(message) => {
++                HttpError::NoSupportedChallenge(message)
++            }
++        })
++    }
++
+     /// Emits `payment.failed` for `error` and hands it back.
+     async fn fail<E>(&self, challenge: Option<PaymentChallenge>, error: HttpError) -> FlowError<E> {
+         self.events
+diff --git a/src/client/mod.rs b/src/client/mod.rs
+index 14e6b39..1924b5a 100644
+--- a/src/client/mod.rs
++++ b/src/client/mod.rs
+@@ -32,6 +32,8 @@ pub mod ws;
+ #[cfg(feature = "tempo")]
+ pub mod tempo;
+ 
++#[cfg(feature = "client")]
++mod charge_client;
+ #[cfg(feature = "client")]
+ mod fetch;
+ #[cfg(feature = "client")]
+@@ -59,6 +61,9 @@ pub use events::{
+ #[cfg(feature = "client")]
+ pub use fetch::PaymentExt as Fetch;
+ 
++#[cfg(feature = "client")]
++pub use charge_client::ChargeClient;
++
+ #[cfg(feature = "middleware")]
+ pub use middleware::PaymentMiddleware;
+ 
+diff --git a/src/client/charge_client.rs b/src/client/charge_client.rs
+new file mode 100644
+index 0000000..b59620b
+--- /dev/null
++++ b/src/client/charge_client.rs
+@@ -0,0 +1,145 @@
++//! SDK-owned HTTP client for opt-in charge payments without redirects.
++
++use reqwest::{Client, ClientBuilder, IntoUrl, Method, Request, RequestBuilder, Response};
++
++use super::flow::{Exchange, FlowError, PaymentFlow};
++use super::{
++    AcceptPaymentPolicy, ClientEvents, HttpError, PaymentProvider, DEFAULT_MAX_PAYMENT_RETRIES,
++};
++use crate::protocol::core::accept_payment::{self, ACCEPT_PAYMENT_HEADER};
++use crate::protocol::core::PaymentChallenge;
++
++/// An HTTP client that can answer charge challenges using either credential header.
++///
++/// This client always disables redirects, including for the initial request.
++/// A `3xx` is returned to the caller without following its `Location`. Both the
++/// initial request and every paid retry execute through the retained client.
++/// Session challenges and session management are excluded.
++///
++/// Automatic payment requires a valid request-level `Accept-Payment` header.
++/// Client default headers do not authorize payment. Preferences, including
++/// `q=0` opt-outs, are respected by the shared challenge selector.
++///
++/// ```no_run
++/// # async fn example<P: mpp::client::PaymentProvider>(provider: &P)
++/// # -> Result<(), Box<dyn std::error::Error>> {
++/// use mpp::client::ChargeClient;
++/// use reqwest::Method;
++///
++/// let client = ChargeClient::new(reqwest::Client::builder())?;
++/// let response = client.send_with_payment(
++///     client.request(Method::GET, "https://api.example.com/paid")
++///         .bearer_auth("api-key")
++///         .header("Accept-Payment", "tempo/charge"),
++///     provider,
++/// ).await?;
++/// # Ok(())
++/// # }
++/// ```
++#[derive(Clone, Debug)]
++pub struct ChargeClient {
++    client: Client,
++}
++
++impl ChargeClient {
++    /// Build the retained client, overriding the builder's redirect policy last.
++    /// No constructor accepts an already-built client with an opaque policy.
++    pub fn new(builder: ClientBuilder) -> Result<Self, HttpError> {
++        Ok(Self {
++            client: builder
++                .redirect(reqwest::redirect::Policy::none())
++                .build()?,
++        })
++    }
++
++    /// Build a request for this client. Use [`Self::send_with_payment`] to send it.
++    pub fn request(&self, method: Method, url: impl IntoUrl) -> RequestBuilder {
++        self.client.request(method, url)
++    }
++
++    /// Send a request with explicit, charge-only payment handling.
++    ///
++    /// Only the request is taken from `request`; its embedded client is ignored.
++    /// A request built by another client still executes through this client.
++    pub async fn send_with_payment<P: PaymentProvider>(
++        &self,
++        request: RequestBuilder,
++        provider: &P,
++    ) -> Result<Response, HttpError> {
++        self.send_with_payment_max_retries(request, provider, DEFAULT_MAX_PAYMENT_RETRIES)
++            .await
++    }
++
++    /// Like [`Self::send_with_payment`], with a cap on paid challenge retries.
++    /// Zero sends the initial request but never prepares or creates a payment.
++    pub async fn send_with_payment_max_retries<P: PaymentProvider>(
++        &self,
++        request: RequestBuilder,
++        provider: &P,
++        max_payment_retries: usize,
++    ) -> Result<Response, HttpError> {
++        let request = request.build().map_err(HttpError::request)?;
++        let preference = request.headers().get(ACCEPT_PAYMENT_HEADER);
++        // Fail closed for ambiguous repeated or malformed preferences. Reqwest
++        // applies client defaults at execute time, after this opt-in decision.
++        let payment_allowed = request
++            .headers()
++            .get_all(ACCEPT_PAYMENT_HEADER)
++            .iter()
++            .count()
++            == 1
++            && preference
++                .and_then(|value| value.to_str().ok())
++                .and_then(|value| accept_payment::parse(value).ok())
++                .is_some_and(|entries| entries.iter().any(|entry| entry.q > 0.0));
++        let mut exchange = ChargeExchange(&self.client);
++        if !payment_allowed || max_payment_retries == 0 {
++            return exchange.send(request).await;
++        }
++
++        let flow = PaymentFlow {
++            provider,
++            policy: &AcceptPaymentPolicy::Never,
++            events: &ClientEvents::default(),
++            max_payment_retries,
++        };
++        flow.run(&mut exchange, request, None)
++            .await
++            .map_err(|error| match error {
++                FlowError::Payment(error) | FlowError::Send(error) => error,
++            })
++    }
++}
++
++// This transport can only be constructed beside the privately retained client.
++struct ChargeExchange<'a>(&'a Client);
++
++impl Exchange for ChargeExchange<'_> {
++    type Error = HttpError;
++
++    fn check_challenge(&self, challenge: &PaymentChallenge) -> Result<(), HttpError> {
++        if challenge.intent.as_str() != "charge" {
++            return Err(HttpError::NoSupportedChallenge(
++                "ChargeClient only supports charge intents".to_owned(),
++            ));
++        }
++        if challenge
++            .credential_header()
++            .eq_ignore_ascii_case("Authorization")
++            || challenge
++                .credential_header()
++                .eq_ignore_ascii_case("Payment-Authorization")
++        {
++            Ok(())
++        } else {
++            Err(HttpError::UnsafeCredentialHeader)
++        }
++    }
++
++    async fn send(&mut self, request: Request) -> Result<Response, Self::Error> {
++        self.0.execute(request).await.map_err(HttpError::request)
++    }
++}
++
++#[cfg(test)]
++mod tests;
+diff --git a/src/client/charge_client/tests.rs b/src/client/charge_client/tests.rs
+new file mode 100644
+index 0000000..6058833
+--- /dev/null
++++ b/src/client/charge_client/tests.rs
+@@ -0,0 +1,597 @@
++use super::*;
++use std::sync::atomic::{AtomicUsize, Ordering};
++use std::sync::{Arc, Mutex};
++
++use axum::http::{HeaderMap, StatusCode};
++use axum::response::IntoResponse;
++use axum::routing::{get, post};
++use axum::Router;
++use tokio::net::TcpListener;
++
++use crate::client::PaymentContext;
++use crate::protocol::core::{
++    format_www_authenticate, parse_authorization, Base64UrlJson, PaymentCredential, PaymentPayload,
++};
++use crate::MppError;
++
++#[derive(Clone, Default)]
++struct Provider {
++    prepared: Arc<AtomicUsize>,
++    paid: Arc<Mutex<Vec<String>>>,
++    replacement: Option<PaymentChallenge>,
++    refresh_first: bool,
++}
++
++impl PaymentProvider for Provider {
++    fn supports(&self, method: &str, _: &str) -> bool {
++        matches!(method, "test" | "alternate")
++    }
++
++    async fn prepare_http_payment_challenge(
++        &self,
++        challenge: &PaymentChallenge,
++        context: PaymentContext,
++    ) -> Result<Option<PaymentChallenge>, MppError> {
++        assert!(
++            context.http_client.is_none(),
++            "no session management client"
++        );
++        let first = self.prepared.fetch_add(1, Ordering::SeqCst) == 0;
++        if first && self.refresh_first {
++            return Ok(None);
++        }
++        Ok(Some(
++            self.replacement
++                .clone()
++                .unwrap_or_else(|| challenge.clone()),
++        ))
++    }
++
++    async fn pay(&self, challenge: &PaymentChallenge) -> Result<PaymentCredential, MppError> {
++        self.paid.lock().unwrap().push(challenge.id.clone());
++        Ok(PaymentCredential::new(
++            challenge.to_echo(),
++            PaymentPayload::hash("offline-proof"),
++        ))
++    }
++}
++
++fn challenge(id: &str, intent: &str, header: &str) -> PaymentChallenge {
++    PaymentChallenge::new(
++        id,
++        "local.test",
++        "test",
++        intent,
++        Base64UrlJson::from_value(&serde_json::json!({"amount": "1"})).unwrap(),
++    )
++    .with_header(header)
++}
++
++fn offer(challenges: &[PaymentChallenge]) -> axum::response::Response {
++    let headers = challenges.iter().map(|challenge| {
++        (
++            "www-authenticate",
++            format_www_authenticate(challenge).unwrap(),
++        )
++    });
++    let mut response = StatusCode::PAYMENT_REQUIRED.into_response();
++    for (name, value) in headers {
++        response.headers_mut().append(name, value.parse().unwrap());
++    }
++    response
++}
++
++async fn server(app: Router) -> String {
++    let listener = TcpListener::bind("127.0.0.1:0").await.unwrap();
++    let address = listener.local_addr().unwrap();
++    tokio::spawn(async move { axum::serve(listener, app).await.unwrap() });
++    format!("http://{address}")
++}
++
++fn client() -> ChargeClient {
++    ChargeClient::new(Client::builder().no_proxy()).unwrap()
++}
++
++#[tokio::test]
++async fn redirects_are_never_followed_before_or_after_payment() {
++    for cross_origin in [false, true] {
++        for initial_redirect in [false, true] {
++            for status in [301, 302, 303, 307, 308] {
++                let contacted = Arc::new(AtomicUsize::new(0));
++                let sink = Router::new().route(
++                    "/sink",
++                    get({
++                        let contacted = contacted.clone();
++                        move || {
++                            contacted.fetch_add(1, Ordering::SeqCst);
++                            async { "unexpected redirect target" }
++                        }
++                    }),
++                );
++                let target = if cross_origin {
++                    format!("{}/sink", server(sink.clone()).await)
++                } else {
++                    "/sink".to_owned()
++                };
++                let url = server(sink.route(
++                    "/",
++                    get(move |headers: HeaderMap| {
++                        let target = target.clone();
++                        async move {
++                            if initial_redirect || headers.contains_key("payment-authorization") {
++                                (
++                                    StatusCode::from_u16(status).unwrap(),
++                                    [("location", target)],
++                                )
++                                    .into_response()
++                            } else {
++                                offer(&[challenge("charge", "charge", "Payment-Authorization")])
++                            }
++                        }
++                    }),
++                ))
++                .await;
++                // A permissive builder must not weaken the retained client's policy.
++                let client = ChargeClient::new(
++                    Client::builder()
++                        .no_proxy()
++                        .redirect(reqwest::redirect::Policy::limited(10)),
++                )
++                .unwrap();
++                let provider = Provider::default();
++                // The caller's builder has its own redirect-following client.
++                let request = Client::new()
++                    .get(url)
++                    .header(ACCEPT_PAYMENT_HEADER, "test/charge");
++                let response = client.send_with_payment(request, &provider).await.unwrap();
++                assert_eq!(response.status().as_u16(), status);
++                assert_eq!(contacted.load(Ordering::SeqCst), 0);
++                assert_eq!(
++                    provider.prepared.load(Ordering::SeqCst),
++                    usize::from(!initial_redirect)
++                );
++                assert_eq!(
++                    provider.paid.lock().unwrap().len(),
++                    usize::from(!initial_redirect)
++                );
++            }
++        }
++    }
++}
++
++#[tokio::test]
++async fn ordinary_authorization_charge_succeeds() {
++    let url = server(Router::new().route(
++        "/",
++        get(|headers: HeaderMap| async move {
++            if let Some(credential) = headers.get("authorization") {
++                assert_eq!(
++                    parse_authorization(credential.to_str().unwrap())
++                        .unwrap()
++                        .challenge
++                        .id,
++                    "charge"
++                );
++                assert!(!headers.contains_key("payment-authorization"));
++                StatusCode::OK.into_response()
++            } else {
++                offer(&[challenge("charge", "charge", "Authorization")])
++            }
++        }),
++    ))
++    .await;
++    let client = client();
++    let provider = Provider::default();
++    let response = client
++        .send_with_payment(
++            client
++                .request(Method::GET, url)
++                .header(ACCEPT_PAYMENT_HEADER, "test/charge"),
++            &provider,
++        )
++        .await
++        .unwrap();
++    assert_eq!(response.status(), StatusCode::OK);
++    assert_eq!(*provider.paid.lock().unwrap(), ["charge"]);
++}
++
++#[tokio::test]
++async fn provider_refresh_uses_owned_client_and_never_follows_redirects() {
++    for redirect in [false, true] {
++        let requests = Arc::new(AtomicUsize::new(0));
++        let sink_requests = Arc::new(AtomicUsize::new(0));
++        let url = server(
++            Router::new()
++                .route(
++                    "/",
++                    get({
++                        let requests = requests.clone();
++                        move |headers: HeaderMap| {
++                            let index = requests.fetch_add(1, Ordering::SeqCst);
++                            async move {
++                                if headers.contains_key("payment-authorization") {
++                                    StatusCode::OK.into_response()
++                                } else if index > 0 && redirect {
++                                    (StatusCode::TEMPORARY_REDIRECT, [("location", "/sink")])
++                                        .into_response()
++                                } else {
++                                    offer(&[challenge(
++                                        if index == 0 { "initial" } else { "fresh" },
++                                        "charge",
++                                        "Payment-Authorization",
++                                    )])
++                                }
++                            }
++                        }
++                    }),
++                )
++                .route(
++                    "/sink",
++                    get({
++                        let sink_requests = sink_requests.clone();
++                        move || {
++                            sink_requests.fetch_add(1, Ordering::SeqCst);
++                            async { "unexpected" }
++                        }
++                    }),
++                ),
++        )
++        .await;
++        let provider = Provider {
++            refresh_first: true,
++            ..Provider::default()
++        };
++        let client = client();
++        let response = client
++            .send_with_payment(
++                client
++                    .request(Method::GET, url)
++                    .header(ACCEPT_PAYMENT_HEADER, "test/charge"),
++                &provider,
++            )
++            .await
++            .unwrap();
++        assert_eq!(sink_requests.load(Ordering::SeqCst), 0);
++        if redirect {
++            assert_eq!(response.status(), StatusCode::TEMPORARY_REDIRECT);
++            assert_eq!(requests.load(Ordering::SeqCst), 2);
++            assert_eq!(provider.prepared.load(Ordering::SeqCst), 1);
++            assert!(provider.paid.lock().unwrap().is_empty());
++        } else {
++            assert_eq!(response.status(), StatusCode::OK);
++            assert_eq!(requests.load(Ordering::SeqCst), 3);
++            assert_eq!(provider.prepared.load(Ordering::SeqCst), 2);
++            assert_eq!(*provider.paid.lock().unwrap(), ["fresh"]);
++        }
++    }
++}
++
++#[tokio::test]
++async fn custom_header_casing_is_preserved_for_initial_and_prepared_challenges() {
++    for header in ["payment-authorization", "PaYmEnT-AuThOrIzAtIoN"] {
++        for replace in [false, true] {
++            let offered = challenge(
++                "charge",
++                "charge",
++                if replace { "Authorization" } else { header },
++            );
++            let replacement = challenge("prepared", "charge", header);
++            let expected_header = header.to_owned();
++            let url = server(Router::new().route(
++                "/",
++                get(move |headers: HeaderMap| {
++                    let offered = offered.clone();
++                    let expected_header = expected_header.clone();
++                    async move {
++                        if let Some(credential) = headers.get("payment-authorization") {
++                            let credential =
++                                parse_authorization(credential.to_str().unwrap()).unwrap();
++                            assert_eq!(
++                                credential.challenge.header.as_deref(),
++                                Some(expected_header.as_str())
++                            );
++                            StatusCode::OK.into_response()
++                        } else {
++                            offer(&[offered])
++                        }
++                    }
++                }),
++            ))
++            .await;
++            let provider = Provider {
++                replacement: replace.then_some(replacement),
++                ..Provider::default()
++            };
++            let client = client();
++            let response = client
++                .send_with_payment(
++                    client
++                        .request(Method::GET, url)
++                        .header(ACCEPT_PAYMENT_HEADER, "test/charge"),
++                    &provider,
++                )
++                .await
++                .unwrap();
++            assert_eq!(response.status(), StatusCode::OK);
++            assert_eq!(
++                *provider.paid.lock().unwrap(),
++                [if replace { "prepared" } else { "charge" }]
++            );
++        }
++    }
++}
++
++#[tokio::test]
++async fn preserves_api_authorization_and_replays_body() {
++    let observed = Arc::new(Mutex::new(Vec::new()));
++    let url = server(Router::new().route(
++        "/",
++        post({
++            let observed = observed.clone();
++            move |headers: HeaderMap, body: String| {
++                let observed = observed.clone();
++                async move {
++                    assert_eq!(headers["authorization"], "Bearer api-key");
++                    assert_eq!(body, "payload");
++                    observed.lock().unwrap().push(headers.clone());
++                    if let Some(credential) = headers.get("payment-authorization") {
++                        assert_eq!(
++                            parse_authorization(credential.to_str().unwrap())
++                                .unwrap()
++                                .challenge
++                                .id,
++                            "charge"
++                        );
++                        StatusCode::OK.into_response()
++                    } else {
++                        offer(&[challenge("charge", "charge", "Payment-Authorization")])
++                    }
++                }
++            }
++        }),
++    ))
++    .await;
++    for default_auth in [false, true] {
++        let mut defaults = HeaderMap::new();
++        if default_auth {
++            defaults.insert("authorization", "Bearer api-key".parse().unwrap());
++        }
++        let client =
++            ChargeClient::new(Client::builder().no_proxy().default_headers(defaults)).unwrap();
++        let mut request = client
++            .request(Method::POST, &url)
++            .header(ACCEPT_PAYMENT_HEADER, "test/charge")
++            .body("payload");
++        if !default_auth {
++            request = request.bearer_auth("api-key");
++        }
++        let response = client
++            .send_with_payment(request, &Provider::default())
++            .await
++            .unwrap();
++        assert_eq!(response.status(), StatusCode::OK);
++    }
++    assert_eq!(observed.lock().unwrap().len(), 4);
++}
++
++#[tokio::test]
++async fn filters_sessions_and_unsupported_methods_before_preparation_and_falls_back() {
++    for with_charge in [false, true] {
++        let url = server(Router::new().route(
++            "/",
++            get(move |headers: HeaderMap| async move {
++                if headers.contains_key("payment-authorization") {
++                    return StatusCode::OK.into_response();
++                }
++                let mut unsupported = challenge("unsupported", "charge", "Payment-Authorization");
++                unsupported.method = "other".into();
++                let mut challenges = vec![
++                    challenge("session", "session", "Authorization"),
++                    challenge("custom-session", "session", "Payment-Authorization"),
++                    unsupported,
++                ];
++                if with_charge {
++                    challenges.push(challenge("charge", "charge", "Payment-Authorization"));
++                }
++                offer(&challenges)
++            }),
++        ))
++        .await;
++        let provider = Provider::default();
++        let client = client();
++        let response = client
++            .send_with_payment(
++                client.request(Method::GET, url).header(
++                    ACCEPT_PAYMENT_HEADER,
++                    "test/session, other/charge, test/charge",
++                ),
++                &provider,
++            )
++            .await;
++        if with_charge {
++            assert_eq!(response.unwrap().status(), StatusCode::OK);
++            assert_eq!(*provider.paid.lock().unwrap(), ["charge"]);
++        } else {
++            assert!(response.is_err());
++            assert_eq!(provider.prepared.load(Ordering::SeqCst), 0);
++            assert!(provider.paid.lock().unwrap().is_empty());
++        }
++    }
++}
++
++#[tokio::test]
++async fn rechecks_prepared_challenge_before_creating_credential() {
++    let mut unsupported = challenge("unsupported", "charge", "Payment-Authorization");
++    unsupported.method = "other".into();
++    let mut opted_out = challenge("opted-out", "charge", "Payment-Authorization");
++    opted_out.method = "alternate".into();
++    let expired = challenge("expired", "charge", "Payment-Authorization")
++        .with_expires("2020-01-01T00:00:00Z");
++    for replacement in [
++        challenge("session", "session", "Authorization"),
++        challenge("custom-session", "session", "Payment-Authorization"),
++        unsupported,
++        opted_out,
++        expired,
++    ] {
++        let url = server(Router::new().route(
++            "/",
++            get(|| async { offer(&[challenge("charge", "charge", "Payment-Authorization")]) }),
++        ))
++        .await;
++        let provider = Provider {
++            replacement: Some(replacement),
++            ..Provider::default()
++        };
++        let client = client();
++        let error = client
++            .send_with_payment(
++                client
++                    .request(Method::GET, url)
++                    .header(ACCEPT_PAYMENT_HEADER, "test/*, alternate/charge;q=0"),
++                &provider,
++            )
++            .await
++            .unwrap_err();
++        assert!(matches!(
++            error,
++            HttpError::NoSupportedChallenge(_) | HttpError::Payment(_)
++        ));
++        assert_eq!(provider.prepared.load(Ordering::SeqCst), 1);
++        assert!(provider.paid.lock().unwrap().is_empty());
++    }
++}
++
++#[tokio::test]
++async fn missing_malformed_ambiguous_and_disabled_preferences_never_prepare() {
++    let url = server(Router::new().route(
++        "/",
++        get(|| async { offer(&[challenge("charge", "charge", "Payment-Authorization")]) }),
++    ))
++    .await;
++    let mut defaults = HeaderMap::new();
++    defaults.insert(ACCEPT_PAYMENT_HEADER, "test/charge".parse().unwrap());
++    let client = ChargeClient::new(Client::builder().no_proxy().default_headers(defaults)).unwrap();
++    for preference in [None, Some(""), Some("invalid"), Some("test/charge;q=0")] {
++        let provider = Provider::default();
++        let mut request = client.request(Method::GET, &url);
++        if let Some(preference) = preference {
++            request = request.header(ACCEPT_PAYMENT_HEADER, preference);
++        }
++        let response = client.send_with_payment(request, &provider).await.unwrap();
++        assert_eq!(response.status(), StatusCode::PAYMENT_REQUIRED);
++        assert_eq!(provider.prepared.load(Ordering::SeqCst), 0);
++    }
++    for repeated in [false, true] {
++        let provider = Provider::default();
++        let mut request = client
++            .request(Method::GET, &url)
++            .header(ACCEPT_PAYMENT_HEADER, "test/charge");
++        if repeated {
++            request = request.header(ACCEPT_PAYMENT_HEADER, "test/charge;q=0");
++        }
++        let cap = if repeated { 3 } else { 0 };
++        let response = client
++            .send_with_payment_max_retries(request, &provider, cap)
++            .await
++            .unwrap();
++        assert_eq!(response.status(), StatusCode::PAYMENT_REQUIRED);
++        assert_eq!(provider.prepared.load(Ordering::SeqCst), 0);
++    }
++}
++
++#[tokio::test]
++async fn method_opt_out_is_preserved_with_other_positive_preferences() {
++    let url = server(Router::new().route(
++        "/",
++        get(|| async { offer(&[challenge("charge", "charge", "Payment-Authorization")]) }),
++    ))
++    .await;
++    let client = client();
++    let provider = Provider::default();
++    let result = client
++        .send_with_payment(
++            client
++                .request(Method::GET, url)
++                .header(ACCEPT_PAYMENT_HEADER, "test/charge;q=0, other/charge"),
++            &provider,
++        )
++        .await;
++    assert!(result.is_err());
++    assert_eq!(provider.prepared.load(Ordering::SeqCst), 0);
++}
++
++#[tokio::test]
++async fn paid_retries_stop_at_cap_and_do_not_repay_same_challenge() {
++    for repeat in [false, true] {
++        let requests = Arc::new(AtomicUsize::new(0));
++        let url = server(Router::new().route(
++            "/",
++            get({
++                let requests = requests.clone();
++                move || {
++                    let index = requests.fetch_add(1, Ordering::SeqCst);
++                    async move {
++                        let id = if repeat {
++                            "same".to_owned()
++                        } else {
++                            index.to_string()
++                        };
++                        offer(&[challenge(&id, "charge", "Payment-Authorization")])
++                    }
++                }
++            }),
++        ))
++        .await;
++        let provider = Provider::default();
++        let client = client();
++        let response = client
++            .send_with_payment_max_retries(
++                client
++                    .request(Method::GET, url)
++                    .header(ACCEPT_PAYMENT_HEADER, "test/charge"),
++                &provider,
++                2,
++            )
++            .await
++            .unwrap();
++        let expected = if repeat { 1 } else { 2 };
++        assert_eq!(response.status(), StatusCode::PAYMENT_REQUIRED);
++        assert_eq!(provider.paid.lock().unwrap().len(), expected);
++        assert_eq!(requests.load(Ordering::SeqCst), expected + 1);
++    }
++}
++
++#[tokio::test]
++async fn noncloneable_body_is_sent_once_and_never_paid() {
++    let url = server(
++        Router::new()
++            .route("/free", post(|body: String| async move { body }))
++            .route(
++                "/paid",
++                post(|| async { offer(&[challenge("charge", "charge", "Payment-Authorization")]) }),
++            ),
++    )
++    .await;
++    let client = client();
++    let provider = Provider::default();
++    for paid in [false, true] {
++        let body: reqwest::Body =
++            reqwest::Response::from(axum::http::Response::new("payload")).into();
++        let request = client
++            .request(
++                Method::POST,
++                format!("{url}/{}", if paid { "paid" } else { "free" }),
++            )
++            .header(ACCEPT_PAYMENT_HEADER, "test/charge")
++            .body(body);
++        let response = client.send_with_payment(request, &provider).await;
++        if paid {
++            assert!(matches!(response, Err(HttpError::CloneFailed)));
++        } else {
++            assert_eq!(response.unwrap().text().await.unwrap(), "payload");
++        }
++    }
++    assert_eq!(provider.prepared.load(Ordering::SeqCst), 0);
++    assert!(provider.paid.lock().unwrap().is_empty());
++}
+diff --git a/.changelog/redirect-safe-charge-client.md b/.changelog/redirect-safe-charge-client.md
+new file mode 100644
+index 0000000..abe3720
+--- /dev/null
++++ b/.changelog/redirect-safe-charge-client.md
+@@ -0,0 +1,9 @@
++---
++mpp: minor
++---
++
++Add `ChargeClient` for explicitly authorized charge payments using either
++`Authorization` or `Payment-Authorization`. The SDK owns the HTTP client and
++disables redirects for initial requests and paid retries. Session offers are
++filtered before provider preparation. Existing Fetch, middleware, and session
++management custom-header restrictions remain in place.

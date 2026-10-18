@@ -1,0 +1,18 @@
+{
+  "Cargo.lock.reviewed": "e9a89a1567b6604e1ede0c97e9e5cfef36450d18c09258ed2b9f4be4b44d8b54",
+  "NEXT_AGENT.md": "af7ddf3eb36dfe3beaa4f65a471a5b7e4fb3a1b74dd05592e0a9f8530223b4f9",
+  "evidence/mpp-rs-574-reviewed-tests.log": "3874cd4c9db826a0ec4a5121b82156d1942fd8a10ec8dee4d58c5dd44fef5937",
+  "evidence/mpp-rs-clippy-workspace.log": "164e0dba96f3a7d96a45993d99358d9900200d4afcee6085debc0620501a322f",
+  "evidence/mpp-rs-compatibility-review-2026-10-18.txt": "09c857def3ee3acaa4c05ccd8ee0fe86f6f013a6740b40815a6e28f51e71ca25",
+  "evidence/mpp-rs-docs.log": "bbac3a5b706969fc5a517dfa2d209fa88d210d95264c60df5f60e0a53e098372",
+  "evidence/mpp-rs-examples-check.log": "2829edd6d62fd85d86601d3941a07c208f0ab503b769f89e199cde3e5eb00dd4",
+  "evidence/mpp-rs-feature-matrix.log": "9623e5ceea484b26207408054220f077503a03802cd45d5f0e5602ea606ad55f",
+  "evidence/mpp-rs-independent-review.txt": "7fa5efcc9009b0dd782d40ce6d7cc625774fd4e905af8a3ec0dbe439bbc31818",
+  "evidence/mpp-rs-pr-draft.txt": "6e19b5ad93056d22b52fa26f6703b1af4d34258aa62ff6beb9658e1774565485",
+  "evidence/mpp-rs-resolve-ci.log": "dc689df89b75779c764e4dd9ba995bbc6c72a7ddc070f27761c9fccae7b01bda",
+  "evidence/mpp-rs-reviewed-charge-client.patch": "315934a989084514c4f1767a6c7e6ee5f929fc3ba6c922322f0499779844bda5",
+  "evidence/mpp-rs-reviewed-source-sha256.json": "55eb1993764fb4b555d49fd7c3d32a27ff3b6fb19fe7296ca74bcbfc55106e82",
+  "evidence/mpp-rs-ring-tree.txt": "440aafed5b121cc5a261fdeea53a289b8361e1c7fe4c195ab7f3e99dc771fe36",
+  "evidence/mpp-rs-workspace-tests.log": "670c6b0013846dc5afd3bf486b870615aaf08f85fee4497a23ee1bcc7820b4c0",
+  "upstream/pr-574-at-46a566b.diff": "6f45bbf1eee1f2cfbaa46a9c3ae417bf0841ff5965722e0e00bf89836251a795"
+}

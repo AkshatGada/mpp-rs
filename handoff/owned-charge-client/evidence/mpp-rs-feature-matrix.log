@@ -1,0 +1,4848 @@
+info: --no-dev-deps modifies real `Cargo.toml` while cargo-hack is running and restores it when finished
+info: running `cargo check --offline --no-default-features` on mpp (1/127)
+   Compiling libc v0.2.191
+   Compiling serde v1.0.229
+    Checking hashbrown v0.17.1
+   Compiling serde_json v1.0.154
+    Checking hybrid-array v0.4.15
+   Compiling serde_core v1.0.229
+    Checking ctutils v0.4.3
+    Checking foldhash v0.2.0
+    Checking memchr v2.8.3
+   Compiling syn v3.0.5
+    Checking subtle v2.6.1
+    Checking crypto-common v0.2.2
+    Checking block-buffer v0.12.1
+    Checking indexmap v2.14.2
+    Checking digest v0.11.3
+    Checking hmac v0.13.0
+   Compiling serde_derive v1.0.229
+   Compiling thiserror-impl v2.0.21
+    Checking thiserror v2.0.21
+    Checking cpufeatures v0.3.1
+    Checking sha2 v0.11.1
+    Checking serde_json_canonicalizer v0.3.2
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: trait `ResultExt` is never used
+   --> src/error.rs:340:18
+    |
+340 | pub(crate) trait ResultExt<T> {
+    |                  ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `mpp` (lib) generated 1 warning
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 3.55s
+
+info: running `cargo check --offline --no-default-features --features utils,ws` on mpp (2/127)
+    Checking smallvec v1.16.0
+    Checking bytes v1.12.1
+    Checking futures-sink v0.3.34
+   Compiling syn v3.0.5
+    Checking form_urlencoded v1.2.2
+    Checking tracing v0.1.44
+    Checking futures-channel v0.3.34
+    Checking bitflags v2.13.2
+    Checking sha2 v0.11.1
+    Checking http v1.5.0
+    Checking http-body v1.1.0
+    Checking http-body-util v0.1.5
+   Compiling zerovec-derive v0.11.6
+   Compiling displaydoc v0.2.7
+   Compiling tokio-macros v2.7.2
+   Compiling futures-macro v0.3.34
+   Compiling serde_derive v1.0.229
+   Compiling thiserror-impl v2.0.21
+    Checking tokio v1.53.3
+    Checking zerotrie v0.2.5
+    Checking futures-util v0.3.34
+    Checking zerovec v0.11.8
+    Checking thiserror v2.0.21
+    Checking serde v1.0.229
+    Checking tinystr v0.8.4
+    Checking potential_utf v0.1.6
+    Checking hyper v1.12.0
+    Checking tower v0.5.3
+    Checking icu_collections v2.3.0
+    Checking icu_locale_core v2.3.0
+    Checking hyper-util v0.1.21
+    Checking icu_provider v2.3.1
+    Checking icu_properties v2.3.0
+    Checking icu_normalizer v2.3.0
+    Checking idna_adapter v1.2.2
+    Checking idna v1.1.0
+    Checking url v2.5.8
+    Checking serde_json_canonicalizer v0.3.2
+    Checking tower-http v0.6.11
+    Checking reqwest v0.13.5
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: trait `ResultExt` is never used
+   --> src/error.rs:340:18
+    |
+340 | pub(crate) trait ResultExt<T> {
+    |                  ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: constant `SECRET_KEY_ENV_VAR` is never used
+  --> src/server/mpp.rs:35:7
+   |
+35 | const SECRET_KEY_ENV_VAR: &str = "MPP_SECRET_KEY";
+   |       ^^^^^^^^^^^^^^^^^^
+
+warning: constant `REALM_ENV_VARS` is never used
+  --> src/server/mpp.rs:43:7
+   |
+43 | const REALM_ENV_VARS: &[&str] = &[
+   |       ^^^^^^^^^^^^^^
+
+warning: constant `DEFAULT_REALM` is never used
+  --> src/server/mpp.rs:53:7
+   |
+53 | const DEFAULT_REALM: &str = "MPP Payment";
+   |       ^^^^^^^^^^^^^
+
+warning: function `detect_realm` is never used
+  --> src/server/mpp.rs:64:15
+   |
+64 | pub(crate) fn detect_realm() -> String {
+   |               ^^^^^^^^^^^^
+
+warning: function `realm_from_env` is never used
+  --> src/server/mpp.rs:68:4
+   |
+68 | fn realm_from_env(lookup: impl Fn(&str) -> Option<String>) -> String {
+   |    ^^^^^^^^^^^^^^
+
+warning: `mpp` (lib) generated 6 warnings
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 5.83s
+
+info: running `cargo check --offline --no-default-features --features axum` on mpp (3/127)
+    Blocking waiting for file lock on build directory
+   Compiling serde_core v1.0.229
+    Checking futures-task v0.3.34
+    Checking sync_wrapper v1.0.2
+    Checking slab v0.4.12
+   Compiling syn v3.0.5
+   Compiling syn v2.0.119
+    Checking axum-core v0.5.6
+    Checking futures-util v0.3.34
+    Checking tower v0.5.3
+   Compiling serde_derive v1.0.229
+   Compiling thiserror-impl v2.0.21
+   Compiling tokio-macros v2.7.2
+   Compiling async-stream-impl v0.3.6
+    Checking tokio v1.53.3
+    Checking async-stream v0.3.6
+    Checking thiserror v2.0.21
+    Checking serde v1.0.229
+    Checking serde_json v1.0.154
+    Checking axum v0.8.9
+    Checking serde_json_canonicalizer v0.3.2
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: trait `ResultExt` is never used
+   --> src/error.rs:340:18
+    |
+340 | pub(crate) trait ResultExt<T> {
+    |                  ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: constant `SECRET_KEY_ENV_VAR` is never used
+  --> src/server/mpp.rs:35:7
+   |
+35 | const SECRET_KEY_ENV_VAR: &str = "MPP_SECRET_KEY";
+   |       ^^^^^^^^^^^^^^^^^^
+
+warning: constant `REALM_ENV_VARS` is never used
+  --> src/server/mpp.rs:43:7
+   |
+43 | const REALM_ENV_VARS: &[&str] = &[
+   |       ^^^^^^^^^^^^^^
+
+warning: constant `DEFAULT_REALM` is never used
+  --> src/server/mpp.rs:53:7
+   |
+53 | const DEFAULT_REALM: &str = "MPP Payment";
+   |       ^^^^^^^^^^^^^
+
+warning: function `detect_realm` is never used
+  --> src/server/mpp.rs:64:15
+   |
+64 | pub(crate) fn detect_realm() -> String {
+   |               ^^^^^^^^^^^^
+
+warning: function `realm_from_env` is never used
+  --> src/server/mpp.rs:68:4
+   |
+68 | fn realm_from_env(lookup: impl Fn(&str) -> Option<String>) -> String {
+   |    ^^^^^^^^^^^^^^
+
+warning: `mpp` (lib) generated 6 warnings
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1m 09s
+
+info: running `cargo check --offline --no-default-features --features client` on mpp (4/127)
+    Blocking waiting for file lock on build directory
+   Compiling syn v3.0.5
+   Compiling syn v2.0.119
+    Checking tokio v1.53.3
+   Compiling synstructure v0.13.2
+   Compiling zerovec-derive v0.11.6
+   Compiling displaydoc v0.2.7
+   Compiling serde_derive v1.0.229
+   Compiling thiserror-impl v2.0.21
+    Checking hyper v1.12.0
+    Checking tower v0.5.3
+   Compiling zerofrom-derive v0.1.7
+   Compiling yoke-derive v0.8.2
+    Checking hyper-util v0.1.21
+    Checking zerofrom v0.1.8
+    Checking thiserror v2.0.21
+    Checking serde v1.0.229
+    Checking yoke v0.8.3
+    Checking serde_json_canonicalizer v0.3.2
+    Checking zerovec v0.11.8
+    Checking zerotrie v0.2.5
+    Checking tinystr v0.8.4
+    Checking potential_utf v0.1.6
+    Checking icu_collections v2.3.0
+    Checking icu_locale_core v2.3.0
+    Checking icu_provider v2.3.1
+    Checking icu_normalizer v2.3.0
+    Checking icu_properties v2.3.0
+    Checking idna_adapter v1.2.2
+    Checking idna v1.1.0
+    Checking url v2.5.8
+    Checking tower-http v0.6.11
+    Checking reqwest v0.13.5
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: trait `ResultExt` is never used
+   --> src/error.rs:340:18
+    |
+340 | pub(crate) trait ResultExt<T> {
+    |                  ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `mpp` (lib) generated 1 warning
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 39.55s
+
+info: running `cargo check --offline --no-default-features --features axum,client` on mpp (5/127)
+    Checking serde v1.0.229
+    Checking tower v0.5.3
+    Checking axum-core v0.5.6
+    Checking hyper-util v0.1.21
+    Checking tower-http v0.6.11
+    Checking serde_json_canonicalizer v0.3.2
+    Checking reqwest v0.13.5
+    Checking axum v0.8.9
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: trait `ResultExt` is never used
+   --> src/error.rs:340:18
+    |
+340 | pub(crate) trait ResultExt<T> {
+    |                  ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: constant `SECRET_KEY_ENV_VAR` is never used
+  --> src/server/mpp.rs:35:7
+   |
+35 | const SECRET_KEY_ENV_VAR: &str = "MPP_SECRET_KEY";
+   |       ^^^^^^^^^^^^^^^^^^
+
+warning: constant `REALM_ENV_VARS` is never used
+  --> src/server/mpp.rs:43:7
+   |
+43 | const REALM_ENV_VARS: &[&str] = &[
+   |       ^^^^^^^^^^^^^^
+
+warning: constant `DEFAULT_REALM` is never used
+  --> src/server/mpp.rs:53:7
+   |
+53 | const DEFAULT_REALM: &str = "MPP Payment";
+   |       ^^^^^^^^^^^^^
+
+warning: function `detect_realm` is never used
+  --> src/server/mpp.rs:64:15
+   |
+64 | pub(crate) fn detect_realm() -> String {
+   |               ^^^^^^^^^^^^
+
+warning: function `realm_from_env` is never used
+  --> src/server/mpp.rs:68:4
+   |
+68 | fn realm_from_env(lookup: impl Fn(&str) -> Option<String>) -> String {
+   |    ^^^^^^^^^^^^^^
+
+warning: `mpp` (lib) generated 6 warnings
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 2.45s
+
+info: running `cargo check --offline --no-default-features --features default` on mpp (6/127)
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: trait `ResultExt` is never used
+   --> src/error.rs:340:18
+    |
+340 | pub(crate) trait ResultExt<T> {
+    |                  ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `mpp` (lib) generated 1 warning
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.50s
+
+info: running `cargo check --offline --no-default-features --features axum,default` on mpp (7/127)
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: trait `ResultExt` is never used
+   --> src/error.rs:340:18
+    |
+340 | pub(crate) trait ResultExt<T> {
+    |                  ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: constant `SECRET_KEY_ENV_VAR` is never used
+  --> src/server/mpp.rs:35:7
+   |
+35 | const SECRET_KEY_ENV_VAR: &str = "MPP_SECRET_KEY";
+   |       ^^^^^^^^^^^^^^^^^^
+
+warning: constant `REALM_ENV_VARS` is never used
+  --> src/server/mpp.rs:43:7
+   |
+43 | const REALM_ENV_VARS: &[&str] = &[
+   |       ^^^^^^^^^^^^^^
+
+warning: constant `DEFAULT_REALM` is never used
+  --> src/server/mpp.rs:53:7
+   |
+53 | const DEFAULT_REALM: &str = "MPP Payment";
+   |       ^^^^^^^^^^^^^
+
+warning: function `detect_realm` is never used
+  --> src/server/mpp.rs:64:15
+   |
+64 | pub(crate) fn detect_realm() -> String {
+   |               ^^^^^^^^^^^^
+
+warning: function `realm_from_env` is never used
+  --> src/server/mpp.rs:68:4
+   |
+68 | fn realm_from_env(lookup: impl Fn(&str) -> Option<String>) -> String {
+   |    ^^^^^^^^^^^^^^
+
+warning: `mpp` (lib) generated 6 warnings
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.67s
+
+info: running `cargo check --offline --no-default-features --features client,default` on mpp (8/127)
+   Compiling aws-lc-rs v1.18.2
+    Checking zeroize v1.9.1
+    Checking tokio v1.53.3
+    Checking security-framework v3.7.0
+    Checking rustls-pki-types v1.15.1
+    Checking hyper v1.12.0
+    Checking tower v0.5.3
+    Checking tower-http v0.6.11
+    Checking hyper-util v0.1.21
+   Compiling rustls v0.23.46
+    Checking rustls-webpki v0.103.15
+    Checking tokio-rustls v0.26.6
+    Checking rustls-platform-verifier v0.7.1
+    Checking hyper-rustls v0.27.10
+    Checking reqwest v0.13.5
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: trait `ResultExt` is never used
+   --> src/error.rs:340:18
+    |
+340 | pub(crate) trait ResultExt<T> {
+    |                  ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `mpp` (lib) generated 1 warning
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 6.36s
+
+info: running `cargo check --offline --no-default-features --features evm` on mpp (9/127)
+   Compiling serde_core v1.0.229
+    Checking zeroize v1.9.1
+    Checking arrayvec v0.7.8
+    Checking ff v0.13.1
+    Checking sha3 v0.11.0
+   Compiling libc v0.2.191
+   Compiling winnow v1.0.4
+    Checking tokio v1.53.3
+    Checking generic-array v0.14.9
+    Checking der v0.7.10
+    Checking group v0.13.0
+    Checking crypto-common v0.1.6
+    Checking block-buffer v0.10.4
+    Checking crypto-bigint v0.5.5
+    Checking digest v0.10.7
+   Compiling alloy-sol-type-parser v1.7.3
+    Checking sec1 v0.7.3
+    Checking spki v0.7.3
+    Checking hmac v0.12.1
+    Checking signature v2.2.0
+    Checking sha2 v0.10.9
+    Checking rfc6979 v0.4.0
+    Checking elliptic-curve v0.13.8
+    Checking ecdsa v0.16.9
+    Checking tower v0.5.3
+    Checking k256 v0.13.4
+   Compiling cpufeatures v0.3.1
+   Compiling keccak v0.2.2
+   Compiling alloy-primitives v1.7.3
+   Compiling alloy-json-abi v1.7.3
+   Compiling alloy-sol-macro-input v1.7.3
+   Compiling alloy-sol-macro-expander v1.7.3
+    Checking serde v1.0.229
+    Checking hashbrown v0.17.1
+    Checking const-hex v1.19.1
+    Checking serde_with v3.24.0
+    Checking bytes v1.12.1
+    Checking smallvec v1.16.0
+    Checking either v1.19.0
+    Checking indexmap v2.14.2
+    Checking lru v0.18.5
+    Checking icu_normalizer v2.3.0
+    Checking parking_lot_core v0.9.12
+    Checking itertools v0.14.0
+    Checking parking_lot v0.12.5
+    Checking dashmap v6.2.1
+    Checking alloy-rlp v0.3.16
+    Checking http v1.5.0
+    Checking tokio-util v0.7.20
+    Checking idna_adapter v1.2.2
+    Checking idna v1.1.0
+    Checking serde_json v1.0.154
+    Checking ruint v1.20.1
+    Checking tokio-stream v0.1.19
+    Checking url v2.5.8
+    Checking http-body v1.1.0
+   Compiling alloy-sol-macro v1.7.3
+    Checking hyper v1.12.0
+    Checking http-body-util v0.1.5
+    Checking nybbles v0.4.8
+    Checking tower-http v0.6.11
+    Checking serde_json_canonicalizer v0.3.2
+    Checking hyper-util v0.1.21
+    Checking alloy-eip2930 v0.2.4
+    Checking alloy-eip8141 v0.1.1
+    Checking alloy-eip7928 v0.4.11
+    Checking alloy-serde v2.5.0
+    Checking alloy-eip7702 v0.6.3
+    Checking alloy-eip2124 v0.2.0
+    Checking alloy-trie v0.9.8
+    Checking alloy-signer v2.5.0
+    Checking alloy-chains v0.2.39
+    Checking alloy-eips v2.5.0
+    Checking reqwest v0.13.5
+    Checking alloy-sol-types v1.7.3
+    Checking alloy-consensus v2.5.0
+    Checking alloy-network-primitives v2.5.0
+    Checking alloy-consensus-any v2.5.0
+    Checking alloy-json-rpc v2.5.0
+    Checking alloy-rpc-types-eth v2.5.0
+    Checking alloy-dyn-abi v1.7.3
+    Checking alloy-transport v2.5.0
+    Checking alloy-core v1.7.3
+    Checking alloy-transport-http v2.5.0
+    Checking alloy-rpc-client v2.5.0
+    Checking alloy-rpc-types-any v2.5.0
+    Checking alloy-rpc-types v2.5.0
+    Checking alloy-network v2.5.0
+    Checking alloy-provider v2.5.0
+    Checking alloy-signer-local v2.5.0
+    Checking alloy-contract v2.5.0
+    Checking alloy v2.5.0
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: trait `ResultExt` is never used
+   --> src/error.rs:340:18
+    |
+340 | pub(crate) trait ResultExt<T> {
+    |                  ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `mpp` (lib) generated 1 warning
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 10.67s
+
+info: running `cargo check --offline --no-default-features --features axum,evm` on mpp (10/127)
+    Checking alloy-rlp v0.3.16
+    Checking tokio-util v0.7.20
+    Checking hyper v1.12.0
+    Checking url v2.5.8
+    Checking axum v0.8.9
+    Checking ruint v1.20.1
+    Checking tokio-stream v0.1.19
+    Checking tower-http v0.6.11
+    Checking hyper-util v0.1.21
+    Checking alloy-primitives v1.7.3
+    Checking nybbles v0.4.8
+    Checking reqwest v0.13.5
+    Checking alloy-json-abi v1.7.3
+    Checking alloy-eip8141 v0.1.1
+    Checking alloy-eip7702 v0.6.3
+    Checking alloy-eip2124 v0.2.0
+    Checking alloy-serde v2.5.0
+    Checking alloy-eip2930 v0.2.4
+    Checking alloy-eip7928 v0.4.11
+    Checking alloy-trie v0.9.8
+    Checking alloy-signer v2.5.0
+    Checking alloy-chains v0.2.39
+    Checking alloy-eips v2.5.0
+    Checking alloy-sol-types v1.7.3
+    Checking alloy-consensus v2.5.0
+    Checking alloy-json-rpc v2.5.0
+    Checking alloy-dyn-abi v1.7.3
+    Checking alloy-transport v2.5.0
+    Checking alloy-core v1.7.3
+    Checking alloy-transport-http v2.5.0
+    Checking alloy-rpc-client v2.5.0
+    Checking alloy-network-primitives v2.5.0
+    Checking alloy-consensus-any v2.5.0
+    Checking alloy-rpc-types-eth v2.5.0
+    Checking alloy-rpc-types-any v2.5.0
+    Checking alloy-rpc-types v2.5.0
+    Checking alloy-network v2.5.0
+    Checking alloy-provider v2.5.0
+    Checking alloy-signer-local v2.5.0
+    Checking alloy-contract v2.5.0
+    Checking alloy v2.5.0
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: trait `ResultExt` is never used
+   --> src/error.rs:340:18
+    |
+340 | pub(crate) trait ResultExt<T> {
+    |                  ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: constant `SECRET_KEY_ENV_VAR` is never used
+  --> src/server/mpp.rs:35:7
+   |
+35 | const SECRET_KEY_ENV_VAR: &str = "MPP_SECRET_KEY";
+   |       ^^^^^^^^^^^^^^^^^^
+
+warning: constant `REALM_ENV_VARS` is never used
+  --> src/server/mpp.rs:43:7
+   |
+43 | const REALM_ENV_VARS: &[&str] = &[
+   |       ^^^^^^^^^^^^^^
+
+warning: constant `DEFAULT_REALM` is never used
+  --> src/server/mpp.rs:53:7
+   |
+53 | const DEFAULT_REALM: &str = "MPP Payment";
+   |       ^^^^^^^^^^^^^
+
+warning: function `detect_realm` is never used
+  --> src/server/mpp.rs:64:15
+   |
+64 | pub(crate) fn detect_realm() -> String {
+   |               ^^^^^^^^^^^^
+
+warning: function `realm_from_env` is never used
+  --> src/server/mpp.rs:68:4
+   |
+68 | fn realm_from_env(lookup: impl Fn(&str) -> Option<String>) -> String {
+   |    ^^^^^^^^^^^^^^
+
+warning: `mpp` (lib) generated 6 warnings
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 5.54s
+
+info: running `cargo check --offline --no-default-features --features client,evm` on mpp (11/127)
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: trait `ResultExt` is never used
+   --> src/error.rs:340:18
+    |
+340 | pub(crate) trait ResultExt<T> {
+    |                  ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `mpp` (lib) generated 1 warning
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.75s
+
+info: running `cargo check --offline --no-default-features --features default,evm` on mpp (12/127)
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: trait `ResultExt` is never used
+   --> src/error.rs:340:18
+    |
+340 | pub(crate) trait ResultExt<T> {
+    |                  ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `mpp` (lib) generated 1 warning
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.56s
+
+info: running `cargo check --offline --no-default-features --features middleware` on mpp (13/127)
+   Compiling syn v3.0.5
+   Compiling zerovec-derive v0.11.6
+   Compiling displaydoc v0.2.7
+   Compiling serde_derive v1.0.229
+   Compiling thiserror-impl v2.0.21
+   Compiling async-trait v0.1.92
+    Checking zerotrie v0.2.5
+    Checking zerovec v0.11.8
+    Checking thiserror v2.0.21
+    Checking serde v1.0.229
+    Checking tinystr v0.8.4
+    Checking potential_utf v0.1.6
+    Checking icu_collections v2.3.0
+    Checking icu_locale_core v2.3.0
+    Checking icu_provider v2.3.1
+    Checking icu_normalizer v2.3.0
+    Checking icu_properties v2.3.0
+    Checking idna_adapter v1.2.2
+    Checking idna v1.1.0
+    Checking url v2.5.8
+    Checking tower-http v0.6.11
+    Checking reqwest v0.13.5
+    Checking serde_json_canonicalizer v0.3.2
+    Checking reqwest-middleware v0.5.2
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: trait `ResultExt` is never used
+   --> src/error.rs:340:18
+    |
+340 | pub(crate) trait ResultExt<T> {
+    |                  ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `mpp` (lib) generated 1 warning
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 6.45s
+
+info: running `cargo check --offline --no-default-features --features axum,middleware` on mpp (14/127)
+   Compiling tokio-macros v2.7.2
+    Checking serde v1.0.229
+    Checking zerovec v0.11.8
+    Checking zerotrie v0.2.5
+    Checking serde_json_canonicalizer v0.3.2
+    Checking tokio v1.53.3
+    Checking tinystr v0.8.4
+    Checking potential_utf v0.1.6
+    Checking icu_collections v2.3.0
+    Checking icu_locale_core v2.3.0
+    Checking icu_provider v2.3.1
+    Checking icu_normalizer v2.3.0
+    Checking icu_properties v2.3.0
+    Checking idna_adapter v1.2.2
+    Checking idna v1.1.0
+    Checking url v2.5.8
+    Checking tower v0.5.3
+    Checking hyper v1.12.0
+    Checking tower-http v0.6.11
+    Checking axum v0.8.9
+    Checking hyper-util v0.1.21
+    Checking reqwest v0.13.5
+    Checking reqwest-middleware v0.5.2
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: trait `ResultExt` is never used
+   --> src/error.rs:340:18
+    |
+340 | pub(crate) trait ResultExt<T> {
+    |                  ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: constant `SECRET_KEY_ENV_VAR` is never used
+  --> src/server/mpp.rs:35:7
+   |
+35 | const SECRET_KEY_ENV_VAR: &str = "MPP_SECRET_KEY";
+   |       ^^^^^^^^^^^^^^^^^^
+
+warning: constant `REALM_ENV_VARS` is never used
+  --> src/server/mpp.rs:43:7
+   |
+43 | const REALM_ENV_VARS: &[&str] = &[
+   |       ^^^^^^^^^^^^^^
+
+warning: constant `DEFAULT_REALM` is never used
+  --> src/server/mpp.rs:53:7
+   |
+53 | const DEFAULT_REALM: &str = "MPP Payment";
+   |       ^^^^^^^^^^^^^
+
+warning: function `detect_realm` is never used
+  --> src/server/mpp.rs:64:15
+   |
+64 | pub(crate) fn detect_realm() -> String {
+   |               ^^^^^^^^^^^^
+
+warning: function `realm_from_env` is never used
+  --> src/server/mpp.rs:68:4
+   |
+68 | fn realm_from_env(lookup: impl Fn(&str) -> Option<String>) -> String {
+   |    ^^^^^^^^^^^^^^
+
+warning: `mpp` (lib) generated 6 warnings
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 3.72s
+
+info: running `cargo check --offline --no-default-features --features default,middleware` on mpp (15/127)
+    Checking tower-http v0.6.11
+    Checking reqwest v0.13.5
+    Checking reqwest-middleware v0.5.2
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: trait `ResultExt` is never used
+   --> src/error.rs:340:18
+    |
+340 | pub(crate) trait ResultExt<T> {
+    |                  ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `mpp` (lib) generated 1 warning
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1.15s
+
+info: running `cargo check --offline --no-default-features --features evm,middleware` on mpp (16/127)
+    Checking reqwest-middleware v0.5.2
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: trait `ResultExt` is never used
+   --> src/error.rs:340:18
+    |
+340 | pub(crate) trait ResultExt<T> {
+    |                  ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `mpp` (lib) generated 1 warning
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.83s
+
+info: running `cargo check --offline --no-default-features --features reqwest-default-tls` on mpp (17/127)
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: trait `ResultExt` is never used
+   --> src/error.rs:340:18
+    |
+340 | pub(crate) trait ResultExt<T> {
+    |                  ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `mpp` (lib) generated 1 warning
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.45s
+
+info: running `cargo check --offline --no-default-features --features axum,reqwest-default-tls` on mpp (18/127)
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: trait `ResultExt` is never used
+   --> src/error.rs:340:18
+    |
+340 | pub(crate) trait ResultExt<T> {
+    |                  ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: constant `SECRET_KEY_ENV_VAR` is never used
+  --> src/server/mpp.rs:35:7
+   |
+35 | const SECRET_KEY_ENV_VAR: &str = "MPP_SECRET_KEY";
+   |       ^^^^^^^^^^^^^^^^^^
+
+warning: constant `REALM_ENV_VARS` is never used
+  --> src/server/mpp.rs:43:7
+   |
+43 | const REALM_ENV_VARS: &[&str] = &[
+   |       ^^^^^^^^^^^^^^
+
+warning: constant `DEFAULT_REALM` is never used
+  --> src/server/mpp.rs:53:7
+   |
+53 | const DEFAULT_REALM: &str = "MPP Payment";
+   |       ^^^^^^^^^^^^^
+
+warning: function `detect_realm` is never used
+  --> src/server/mpp.rs:64:15
+   |
+64 | pub(crate) fn detect_realm() -> String {
+   |               ^^^^^^^^^^^^
+
+warning: function `realm_from_env` is never used
+  --> src/server/mpp.rs:68:4
+   |
+68 | fn realm_from_env(lookup: impl Fn(&str) -> Option<String>) -> String {
+   |    ^^^^^^^^^^^^^^
+
+warning: `mpp` (lib) generated 6 warnings
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.59s
+
+info: running `cargo check --offline --no-default-features --features client,reqwest-default-tls` on mpp (19/127)
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: trait `ResultExt` is never used
+   --> src/error.rs:340:18
+    |
+340 | pub(crate) trait ResultExt<T> {
+    |                  ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `mpp` (lib) generated 1 warning
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.65s
+
+info: running `cargo check --offline --no-default-features --features evm,reqwest-default-tls` on mpp (20/127)
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: trait `ResultExt` is never used
+   --> src/error.rs:340:18
+    |
+340 | pub(crate) trait ResultExt<T> {
+    |                  ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `mpp` (lib) generated 1 warning
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.54s
+
+info: running `cargo check --offline --no-default-features --features middleware,reqwest-default-tls` on mpp (21/127)
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: trait `ResultExt` is never used
+   --> src/error.rs:340:18
+    |
+340 | pub(crate) trait ResultExt<T> {
+    |                  ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `mpp` (lib) generated 1 warning
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.71s
+
+info: running `cargo check --offline --no-default-features --features reqwest-native-tls` on mpp (22/127)
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: trait `ResultExt` is never used
+   --> src/error.rs:340:18
+    |
+340 | pub(crate) trait ResultExt<T> {
+    |                  ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `mpp` (lib) generated 1 warning
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.44s
+
+info: running `cargo check --offline --no-default-features --features axum,reqwest-native-tls` on mpp (23/127)
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: trait `ResultExt` is never used
+   --> src/error.rs:340:18
+    |
+340 | pub(crate) trait ResultExt<T> {
+    |                  ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: constant `SECRET_KEY_ENV_VAR` is never used
+  --> src/server/mpp.rs:35:7
+   |
+35 | const SECRET_KEY_ENV_VAR: &str = "MPP_SECRET_KEY";
+   |       ^^^^^^^^^^^^^^^^^^
+
+warning: constant `REALM_ENV_VARS` is never used
+  --> src/server/mpp.rs:43:7
+   |
+43 | const REALM_ENV_VARS: &[&str] = &[
+   |       ^^^^^^^^^^^^^^
+
+warning: constant `DEFAULT_REALM` is never used
+  --> src/server/mpp.rs:53:7
+   |
+53 | const DEFAULT_REALM: &str = "MPP Payment";
+   |       ^^^^^^^^^^^^^
+
+warning: function `detect_realm` is never used
+  --> src/server/mpp.rs:64:15
+   |
+64 | pub(crate) fn detect_realm() -> String {
+   |               ^^^^^^^^^^^^
+
+warning: function `realm_from_env` is never used
+  --> src/server/mpp.rs:68:4
+   |
+68 | fn realm_from_env(lookup: impl Fn(&str) -> Option<String>) -> String {
+   |    ^^^^^^^^^^^^^^
+
+warning: `mpp` (lib) generated 6 warnings
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.58s
+
+info: running `cargo check --offline --no-default-features --features client,reqwest-native-tls` on mpp (24/127)
+    Checking tokio-native-tls v0.3.1
+    Checking tower-http v0.6.11
+    Checking hyper-tls v0.6.0
+    Checking reqwest v0.13.5
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: trait `ResultExt` is never used
+   --> src/error.rs:340:18
+    |
+340 | pub(crate) trait ResultExt<T> {
+    |                  ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `mpp` (lib) generated 1 warning
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.98s
+
+info: running `cargo check --offline --no-default-features --features default,reqwest-native-tls` on mpp (25/127)
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: trait `ResultExt` is never used
+   --> src/error.rs:340:18
+    |
+340 | pub(crate) trait ResultExt<T> {
+    |                  ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `mpp` (lib) generated 1 warning
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.45s
+
+info: running `cargo check --offline --no-default-features --features evm,reqwest-native-tls` on mpp (26/127)
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: trait `ResultExt` is never used
+   --> src/error.rs:340:18
+    |
+340 | pub(crate) trait ResultExt<T> {
+    |                  ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `mpp` (lib) generated 1 warning
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.55s
+
+info: running `cargo check --offline --no-default-features --features middleware,reqwest-native-tls` on mpp (27/127)
+    Checking tower-http v0.6.11
+    Checking reqwest v0.13.5
+    Checking reqwest-middleware v0.5.2
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: trait `ResultExt` is never used
+   --> src/error.rs:340:18
+    |
+340 | pub(crate) trait ResultExt<T> {
+    |                  ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `mpp` (lib) generated 1 warning
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1.09s
+
+info: running `cargo check --offline --no-default-features --features reqwest-default-tls,reqwest-native-tls` on mpp (28/127)
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: trait `ResultExt` is never used
+   --> src/error.rs:340:18
+    |
+340 | pub(crate) trait ResultExt<T> {
+    |                  ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `mpp` (lib) generated 1 warning
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.45s
+
+info: running `cargo check --offline --no-default-features --features reqwest-rustls-tls` on mpp (29/127)
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: trait `ResultExt` is never used
+   --> src/error.rs:340:18
+    |
+340 | pub(crate) trait ResultExt<T> {
+    |                  ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `mpp` (lib) generated 1 warning
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.44s
+
+info: running `cargo check --offline --no-default-features --features axum,reqwest-rustls-tls` on mpp (30/127)
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: trait `ResultExt` is never used
+   --> src/error.rs:340:18
+    |
+340 | pub(crate) trait ResultExt<T> {
+    |                  ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: constant `SECRET_KEY_ENV_VAR` is never used
+  --> src/server/mpp.rs:35:7
+   |
+35 | const SECRET_KEY_ENV_VAR: &str = "MPP_SECRET_KEY";
+   |       ^^^^^^^^^^^^^^^^^^
+
+warning: constant `REALM_ENV_VARS` is never used
+  --> src/server/mpp.rs:43:7
+   |
+43 | const REALM_ENV_VARS: &[&str] = &[
+   |       ^^^^^^^^^^^^^^
+
+warning: constant `DEFAULT_REALM` is never used
+  --> src/server/mpp.rs:53:7
+   |
+53 | const DEFAULT_REALM: &str = "MPP Payment";
+   |       ^^^^^^^^^^^^^
+
+warning: function `detect_realm` is never used
+  --> src/server/mpp.rs:64:15
+   |
+64 | pub(crate) fn detect_realm() -> String {
+   |               ^^^^^^^^^^^^
+
+warning: function `realm_from_env` is never used
+  --> src/server/mpp.rs:68:4
+   |
+68 | fn realm_from_env(lookup: impl Fn(&str) -> Option<String>) -> String {
+   |    ^^^^^^^^^^^^^^
+
+warning: `mpp` (lib) generated 6 warnings
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.59s
+
+info: running `cargo check --offline --no-default-features --features client,reqwest-rustls-tls` on mpp (31/127)
+    Checking reqwest v0.13.5
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: trait `ResultExt` is never used
+   --> src/error.rs:340:18
+    |
+340 | pub(crate) trait ResultExt<T> {
+    |                  ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `mpp` (lib) generated 1 warning
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.90s
+
+info: running `cargo check --offline --no-default-features --features default,reqwest-rustls-tls` on mpp (32/127)
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: trait `ResultExt` is never used
+   --> src/error.rs:340:18
+    |
+340 | pub(crate) trait ResultExt<T> {
+    |                  ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `mpp` (lib) generated 1 warning
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.42s
+
+info: running `cargo check --offline --no-default-features --features evm,reqwest-rustls-tls` on mpp (33/127)
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: trait `ResultExt` is never used
+   --> src/error.rs:340:18
+    |
+340 | pub(crate) trait ResultExt<T> {
+    |                  ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `mpp` (lib) generated 1 warning
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.53s
+
+info: running `cargo check --offline --no-default-features --features middleware,reqwest-rustls-tls` on mpp (34/127)
+    Checking reqwest v0.13.5
+    Checking reqwest-middleware v0.5.2
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: trait `ResultExt` is never used
+   --> src/error.rs:340:18
+    |
+340 | pub(crate) trait ResultExt<T> {
+    |                  ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `mpp` (lib) generated 1 warning
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1.05s
+
+info: running `cargo check --offline --no-default-features --features reqwest-default-tls,reqwest-rustls-tls` on mpp (35/127)
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: trait `ResultExt` is never used
+   --> src/error.rs:340:18
+    |
+340 | pub(crate) trait ResultExt<T> {
+    |                  ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `mpp` (lib) generated 1 warning
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.42s
+
+info: running `cargo check --offline --no-default-features --features reqwest-native-tls,reqwest-rustls-tls` on mpp (36/127)
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: trait `ResultExt` is never used
+   --> src/error.rs:340:18
+    |
+340 | pub(crate) trait ResultExt<T> {
+    |                  ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `mpp` (lib) generated 1 warning
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.42s
+
+info: running `cargo check --offline --no-default-features --features reqwest-rustls-tls-no-provider` on mpp (37/127)
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: trait `ResultExt` is never used
+   --> src/error.rs:340:18
+    |
+340 | pub(crate) trait ResultExt<T> {
+    |                  ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `mpp` (lib) generated 1 warning
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.43s
+
+info: running `cargo check --offline --no-default-features --features axum,reqwest-rustls-tls-no-provider` on mpp (38/127)
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: trait `ResultExt` is never used
+   --> src/error.rs:340:18
+    |
+340 | pub(crate) trait ResultExt<T> {
+    |                  ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: constant `SECRET_KEY_ENV_VAR` is never used
+  --> src/server/mpp.rs:35:7
+   |
+35 | const SECRET_KEY_ENV_VAR: &str = "MPP_SECRET_KEY";
+   |       ^^^^^^^^^^^^^^^^^^
+
+warning: constant `REALM_ENV_VARS` is never used
+  --> src/server/mpp.rs:43:7
+   |
+43 | const REALM_ENV_VARS: &[&str] = &[
+   |       ^^^^^^^^^^^^^^
+
+warning: constant `DEFAULT_REALM` is never used
+  --> src/server/mpp.rs:53:7
+   |
+53 | const DEFAULT_REALM: &str = "MPP Payment";
+   |       ^^^^^^^^^^^^^
+
+warning: function `detect_realm` is never used
+  --> src/server/mpp.rs:64:15
+   |
+64 | pub(crate) fn detect_realm() -> String {
+   |               ^^^^^^^^^^^^
+
+warning: function `realm_from_env` is never used
+  --> src/server/mpp.rs:68:4
+   |
+68 | fn realm_from_env(lookup: impl Fn(&str) -> Option<String>) -> String {
+   |    ^^^^^^^^^^^^^^
+
+warning: `mpp` (lib) generated 6 warnings
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.56s
+
+info: running `cargo check --offline --no-default-features --features client,reqwest-rustls-tls-no-provider` on mpp (39/127)
+   Compiling rustls v0.23.46
+    Checking rustls-webpki v0.103.15
+    Checking tokio-rustls v0.26.6
+    Checking rustls-platform-verifier v0.7.1
+    Checking hyper-rustls v0.27.10
+    Checking reqwest v0.13.5
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: trait `ResultExt` is never used
+   --> src/error.rs:340:18
+    |
+340 | pub(crate) trait ResultExt<T> {
+    |                  ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `mpp` (lib) generated 1 warning
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 2.32s
+
+info: running `cargo check --offline --no-default-features --features default,reqwest-rustls-tls-no-provider` on mpp (40/127)
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: trait `ResultExt` is never used
+   --> src/error.rs:340:18
+    |
+340 | pub(crate) trait ResultExt<T> {
+    |                  ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `mpp` (lib) generated 1 warning
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.42s
+
+info: running `cargo check --offline --no-default-features --features evm,reqwest-rustls-tls-no-provider` on mpp (41/127)
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: trait `ResultExt` is never used
+   --> src/error.rs:340:18
+    |
+340 | pub(crate) trait ResultExt<T> {
+    |                  ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `mpp` (lib) generated 1 warning
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.53s
+
+info: running `cargo check --offline --no-default-features --features middleware,reqwest-rustls-tls-no-provider` on mpp (42/127)
+    Checking reqwest v0.13.5
+    Checking reqwest-middleware v0.5.2
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: trait `ResultExt` is never used
+   --> src/error.rs:340:18
+    |
+340 | pub(crate) trait ResultExt<T> {
+    |                  ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `mpp` (lib) generated 1 warning
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1.00s
+
+info: running `cargo check --offline --no-default-features --features reqwest-default-tls,reqwest-rustls-tls-no-provider` on mpp (43/127)
+    Blocking waiting for file lock on build directory
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: trait `ResultExt` is never used
+   --> src/error.rs:340:18
+    |
+340 | pub(crate) trait ResultExt<T> {
+    |                  ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `mpp` (lib) generated 1 warning
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 28.90s
+
+info: running `cargo check --offline --no-default-features --features reqwest-native-tls,reqwest-rustls-tls-no-provider` on mpp (44/127)
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: trait `ResultExt` is never used
+   --> src/error.rs:340:18
+    |
+340 | pub(crate) trait ResultExt<T> {
+    |                  ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `mpp` (lib) generated 1 warning
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.60s
+
+info: running `cargo check --offline --no-default-features --features reqwest-rustls-tls,reqwest-rustls-tls-no-provider` on mpp (45/127)
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: trait `ResultExt` is never used
+   --> src/error.rs:340:18
+    |
+340 | pub(crate) trait ResultExt<T> {
+    |                  ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `mpp` (lib) generated 1 warning
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.49s
+
+info: running `cargo check --offline --no-default-features --features server` on mpp (46/127)
+    Checking serde v1.0.229
+    Checking serde_json_canonicalizer v0.3.2
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: trait `ResultExt` is never used
+   --> src/error.rs:340:18
+    |
+340 | pub(crate) trait ResultExt<T> {
+    |                  ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: constant `SECRET_KEY_ENV_VAR` is never used
+  --> src/server/mpp.rs:35:7
+   |
+35 | const SECRET_KEY_ENV_VAR: &str = "MPP_SECRET_KEY";
+   |       ^^^^^^^^^^^^^^^^^^
+
+warning: constant `REALM_ENV_VARS` is never used
+  --> src/server/mpp.rs:43:7
+   |
+43 | const REALM_ENV_VARS: &[&str] = &[
+   |       ^^^^^^^^^^^^^^
+
+warning: constant `DEFAULT_REALM` is never used
+  --> src/server/mpp.rs:53:7
+   |
+53 | const DEFAULT_REALM: &str = "MPP Payment";
+   |       ^^^^^^^^^^^^^
+
+warning: function `detect_realm` is never used
+  --> src/server/mpp.rs:64:15
+   |
+64 | pub(crate) fn detect_realm() -> String {
+   |               ^^^^^^^^^^^^
+
+warning: function `realm_from_env` is never used
+  --> src/server/mpp.rs:68:4
+   |
+68 | fn realm_from_env(lookup: impl Fn(&str) -> Option<String>) -> String {
+   |    ^^^^^^^^^^^^^^
+
+warning: `mpp` (lib) generated 6 warnings
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.81s
+
+info: running `cargo check --offline --no-default-features --features client,server` on mpp (47/127)
+    Checking reqwest v0.13.5
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: trait `ResultExt` is never used
+   --> src/error.rs:340:18
+    |
+340 | pub(crate) trait ResultExt<T> {
+    |                  ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: constant `SECRET_KEY_ENV_VAR` is never used
+  --> src/server/mpp.rs:35:7
+   |
+35 | const SECRET_KEY_ENV_VAR: &str = "MPP_SECRET_KEY";
+   |       ^^^^^^^^^^^^^^^^^^
+
+warning: constant `REALM_ENV_VARS` is never used
+  --> src/server/mpp.rs:43:7
+   |
+43 | const REALM_ENV_VARS: &[&str] = &[
+   |       ^^^^^^^^^^^^^^
+
+warning: constant `DEFAULT_REALM` is never used
+  --> src/server/mpp.rs:53:7
+   |
+53 | const DEFAULT_REALM: &str = "MPP Payment";
+   |       ^^^^^^^^^^^^^
+
+warning: function `detect_realm` is never used
+  --> src/server/mpp.rs:64:15
+   |
+64 | pub(crate) fn detect_realm() -> String {
+   |               ^^^^^^^^^^^^
+
+warning: function `realm_from_env` is never used
+  --> src/server/mpp.rs:68:4
+   |
+68 | fn realm_from_env(lookup: impl Fn(&str) -> Option<String>) -> String {
+   |    ^^^^^^^^^^^^^^
+
+warning: `mpp` (lib) generated 6 warnings
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1.06s
+
+info: running `cargo check --offline --no-default-features --features default,server` on mpp (48/127)
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: trait `ResultExt` is never used
+   --> src/error.rs:340:18
+    |
+340 | pub(crate) trait ResultExt<T> {
+    |                  ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: constant `SECRET_KEY_ENV_VAR` is never used
+  --> src/server/mpp.rs:35:7
+   |
+35 | const SECRET_KEY_ENV_VAR: &str = "MPP_SECRET_KEY";
+   |       ^^^^^^^^^^^^^^^^^^
+
+warning: constant `REALM_ENV_VARS` is never used
+  --> src/server/mpp.rs:43:7
+   |
+43 | const REALM_ENV_VARS: &[&str] = &[
+   |       ^^^^^^^^^^^^^^
+
+warning: constant `DEFAULT_REALM` is never used
+  --> src/server/mpp.rs:53:7
+   |
+53 | const DEFAULT_REALM: &str = "MPP Payment";
+   |       ^^^^^^^^^^^^^
+
+warning: function `detect_realm` is never used
+  --> src/server/mpp.rs:64:15
+   |
+64 | pub(crate) fn detect_realm() -> String {
+   |               ^^^^^^^^^^^^
+
+warning: function `realm_from_env` is never used
+  --> src/server/mpp.rs:68:4
+   |
+68 | fn realm_from_env(lookup: impl Fn(&str) -> Option<String>) -> String {
+   |    ^^^^^^^^^^^^^^
+
+warning: `mpp` (lib) generated 6 warnings
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.57s
+
+info: running `cargo check --offline --no-default-features --features evm,server` on mpp (49/127)
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: trait `ResultExt` is never used
+   --> src/error.rs:340:18
+    |
+340 | pub(crate) trait ResultExt<T> {
+    |                  ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: constant `SECRET_KEY_ENV_VAR` is never used
+  --> src/server/mpp.rs:35:7
+   |
+35 | const SECRET_KEY_ENV_VAR: &str = "MPP_SECRET_KEY";
+   |       ^^^^^^^^^^^^^^^^^^
+
+warning: constant `REALM_ENV_VARS` is never used
+  --> src/server/mpp.rs:43:7
+   |
+43 | const REALM_ENV_VARS: &[&str] = &[
+   |       ^^^^^^^^^^^^^^
+
+warning: constant `DEFAULT_REALM` is never used
+  --> src/server/mpp.rs:53:7
+   |
+53 | const DEFAULT_REALM: &str = "MPP Payment";
+   |       ^^^^^^^^^^^^^
+
+warning: function `detect_realm` is never used
+  --> src/server/mpp.rs:64:15
+   |
+64 | pub(crate) fn detect_realm() -> String {
+   |               ^^^^^^^^^^^^
+
+warning: function `realm_from_env` is never used
+  --> src/server/mpp.rs:68:4
+   |
+68 | fn realm_from_env(lookup: impl Fn(&str) -> Option<String>) -> String {
+   |    ^^^^^^^^^^^^^^
+
+warning: `mpp` (lib) generated 6 warnings
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1.00s
+
+info: running `cargo check --offline --no-default-features --features middleware,server` on mpp (50/127)
+    Checking reqwest v0.13.5
+    Checking reqwest-middleware v0.5.2
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: trait `ResultExt` is never used
+   --> src/error.rs:340:18
+    |
+340 | pub(crate) trait ResultExt<T> {
+    |                  ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: constant `SECRET_KEY_ENV_VAR` is never used
+  --> src/server/mpp.rs:35:7
+   |
+35 | const SECRET_KEY_ENV_VAR: &str = "MPP_SECRET_KEY";
+   |       ^^^^^^^^^^^^^^^^^^
+
+warning: constant `REALM_ENV_VARS` is never used
+  --> src/server/mpp.rs:43:7
+   |
+43 | const REALM_ENV_VARS: &[&str] = &[
+   |       ^^^^^^^^^^^^^^
+
+warning: constant `DEFAULT_REALM` is never used
+  --> src/server/mpp.rs:53:7
+   |
+53 | const DEFAULT_REALM: &str = "MPP Payment";
+   |       ^^^^^^^^^^^^^
+
+warning: function `detect_realm` is never used
+  --> src/server/mpp.rs:64:15
+   |
+64 | pub(crate) fn detect_realm() -> String {
+   |               ^^^^^^^^^^^^
+
+warning: function `realm_from_env` is never used
+  --> src/server/mpp.rs:68:4
+   |
+68 | fn realm_from_env(lookup: impl Fn(&str) -> Option<String>) -> String {
+   |    ^^^^^^^^^^^^^^
+
+warning: `mpp` (lib) generated 6 warnings
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1.22s
+
+info: running `cargo check --offline --no-default-features --features reqwest-default-tls,server` on mpp (51/127)
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: trait `ResultExt` is never used
+   --> src/error.rs:340:18
+    |
+340 | pub(crate) trait ResultExt<T> {
+    |                  ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: constant `SECRET_KEY_ENV_VAR` is never used
+  --> src/server/mpp.rs:35:7
+   |
+35 | const SECRET_KEY_ENV_VAR: &str = "MPP_SECRET_KEY";
+   |       ^^^^^^^^^^^^^^^^^^
+
+warning: constant `REALM_ENV_VARS` is never used
+  --> src/server/mpp.rs:43:7
+   |
+43 | const REALM_ENV_VARS: &[&str] = &[
+   |       ^^^^^^^^^^^^^^
+
+warning: constant `DEFAULT_REALM` is never used
+  --> src/server/mpp.rs:53:7
+   |
+53 | const DEFAULT_REALM: &str = "MPP Payment";
+   |       ^^^^^^^^^^^^^
+
+warning: function `detect_realm` is never used
+  --> src/server/mpp.rs:64:15
+   |
+64 | pub(crate) fn detect_realm() -> String {
+   |               ^^^^^^^^^^^^
+
+warning: function `realm_from_env` is never used
+  --> src/server/mpp.rs:68:4
+   |
+68 | fn realm_from_env(lookup: impl Fn(&str) -> Option<String>) -> String {
+   |    ^^^^^^^^^^^^^^
+
+warning: `mpp` (lib) generated 6 warnings
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.55s
+
+info: running `cargo check --offline --no-default-features --features reqwest-native-tls,server` on mpp (52/127)
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: trait `ResultExt` is never used
+   --> src/error.rs:340:18
+    |
+340 | pub(crate) trait ResultExt<T> {
+    |                  ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: constant `SECRET_KEY_ENV_VAR` is never used
+  --> src/server/mpp.rs:35:7
+   |
+35 | const SECRET_KEY_ENV_VAR: &str = "MPP_SECRET_KEY";
+   |       ^^^^^^^^^^^^^^^^^^
+
+warning: constant `REALM_ENV_VARS` is never used
+  --> src/server/mpp.rs:43:7
+   |
+43 | const REALM_ENV_VARS: &[&str] = &[
+   |       ^^^^^^^^^^^^^^
+
+warning: constant `DEFAULT_REALM` is never used
+  --> src/server/mpp.rs:53:7
+   |
+53 | const DEFAULT_REALM: &str = "MPP Payment";
+   |       ^^^^^^^^^^^^^
+
+warning: function `detect_realm` is never used
+  --> src/server/mpp.rs:64:15
+   |
+64 | pub(crate) fn detect_realm() -> String {
+   |               ^^^^^^^^^^^^
+
+warning: function `realm_from_env` is never used
+  --> src/server/mpp.rs:68:4
+   |
+68 | fn realm_from_env(lookup: impl Fn(&str) -> Option<String>) -> String {
+   |    ^^^^^^^^^^^^^^
+
+warning: `mpp` (lib) generated 6 warnings
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.55s
+
+info: running `cargo check --offline --no-default-features --features reqwest-rustls-tls,server` on mpp (53/127)
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: trait `ResultExt` is never used
+   --> src/error.rs:340:18
+    |
+340 | pub(crate) trait ResultExt<T> {
+    |                  ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: constant `SECRET_KEY_ENV_VAR` is never used
+  --> src/server/mpp.rs:35:7
+   |
+35 | const SECRET_KEY_ENV_VAR: &str = "MPP_SECRET_KEY";
+   |       ^^^^^^^^^^^^^^^^^^
+
+warning: constant `REALM_ENV_VARS` is never used
+  --> src/server/mpp.rs:43:7
+   |
+43 | const REALM_ENV_VARS: &[&str] = &[
+   |       ^^^^^^^^^^^^^^
+
+warning: constant `DEFAULT_REALM` is never used
+  --> src/server/mpp.rs:53:7
+   |
+53 | const DEFAULT_REALM: &str = "MPP Payment";
+   |       ^^^^^^^^^^^^^
+
+warning: function `detect_realm` is never used
+  --> src/server/mpp.rs:64:15
+   |
+64 | pub(crate) fn detect_realm() -> String {
+   |               ^^^^^^^^^^^^
+
+warning: function `realm_from_env` is never used
+  --> src/server/mpp.rs:68:4
+   |
+68 | fn realm_from_env(lookup: impl Fn(&str) -> Option<String>) -> String {
+   |    ^^^^^^^^^^^^^^
+
+warning: `mpp` (lib) generated 6 warnings
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.56s
+
+info: running `cargo check --offline --no-default-features --features reqwest-rustls-tls-no-provider,server` on mpp (54/127)
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: trait `ResultExt` is never used
+   --> src/error.rs:340:18
+    |
+340 | pub(crate) trait ResultExt<T> {
+    |                  ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: constant `SECRET_KEY_ENV_VAR` is never used
+  --> src/server/mpp.rs:35:7
+   |
+35 | const SECRET_KEY_ENV_VAR: &str = "MPP_SECRET_KEY";
+   |       ^^^^^^^^^^^^^^^^^^
+
+warning: constant `REALM_ENV_VARS` is never used
+  --> src/server/mpp.rs:43:7
+   |
+43 | const REALM_ENV_VARS: &[&str] = &[
+   |       ^^^^^^^^^^^^^^
+
+warning: constant `DEFAULT_REALM` is never used
+  --> src/server/mpp.rs:53:7
+   |
+53 | const DEFAULT_REALM: &str = "MPP Payment";
+   |       ^^^^^^^^^^^^^
+
+warning: function `detect_realm` is never used
+  --> src/server/mpp.rs:64:15
+   |
+64 | pub(crate) fn detect_realm() -> String {
+   |               ^^^^^^^^^^^^
+
+warning: function `realm_from_env` is never used
+  --> src/server/mpp.rs:68:4
+   |
+68 | fn realm_from_env(lookup: impl Fn(&str) -> Option<String>) -> String {
+   |    ^^^^^^^^^^^^^^
+
+warning: `mpp` (lib) generated 6 warnings
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.57s
+
+info: running `cargo check --offline --no-default-features --features sqlite` on mpp (55/127)
+    Checking serdect v0.2.0
+    Checking rand_core v0.9.5
+    Checking alloy-rlp v0.3.16
+   Compiling aws-lc-sys v0.46.0
+    Checking commonware-codec v2026.9.0
+    Checking commonware-formatting v2026.9.0
+   Compiling aws-lc-rs v1.18.2
+    Checking rusqlite v0.38.0
+    Checking sec1 v0.7.3
+    Checking rand_chacha v0.9.0
+    Checking elliptic-curve v0.13.8
+    Checking rand v0.9.5
+    Checking commonware-utils v2026.9.0
+    Checking ecdsa v0.16.9
+    Checking primeorder v0.13.6
+    Checking ruint v1.20.1
+    Checking k256 v0.13.4
+    Checking p256 v0.13.2
+    Checking commonware-math v2026.9.0
+    Checking alloy-primitives v1.7.3
+    Checking nybbles v0.4.8
+    Checking alloy-eip2124 v0.2.0
+    Checking alloy-json-abi v1.7.3
+    Checking alloy-eip8141 v0.1.1
+    Checking alloy-serde v2.5.0
+    Checking alloy-eip7928 v0.4.11
+    Checking alloy-eip2930 v0.2.4
+    Checking alloy-eip7702 v0.6.3
+    Checking alloy-trie v0.9.8
+    Checking alloy-chains v0.2.39
+    Checking alloy-signer v2.5.0
+    Checking alloy-hardforks v0.4.10
+    Checking alloy-sol-types v1.7.3
+    Checking alloy-eips v2.5.0
+    Checking alloy-consensus v2.5.0
+    Checking tempo-hardfork v1.11.0
+    Checking alloy-genesis v2.5.0
+    Checking alloy-json-rpc v2.5.0
+    Checking alloy-dyn-abi v1.7.3
+    Checking alloy-transport v2.5.0
+    Checking alloy-core v1.7.3
+    Checking alloy-transport-http v2.5.0
+    Checking alloy-rpc-client v2.5.0
+    Checking alloy-consensus-any v2.5.0
+    Checking alloy-network-primitives v2.5.0
+    Checking alloy-rpc-types-eth v2.5.0
+    Checking alloy-rpc-types-any v2.5.0
+    Checking alloy-rpc-types v2.5.0
+    Checking alloy-network v2.5.0
+    Checking alloy-provider v2.5.0
+    Checking alloy-signer-local v2.5.0
+    Checking alloy-contract v2.5.0
+    Checking tempo-contracts v1.11.0
+    Checking alloy v2.5.0
+    Checking commonware-cryptography v2026.9.0
+    Checking tempo-primitives v1.11.0
+    Checking tempo-chainspec v1.11.0
+    Checking tempo-alloy v1.11.0
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: unused import: `binding::validate_secret_key`
+  --> src/protocol/core/mod.rs:82:16
+   |
+82 | pub(crate) use binding::validate_secret_key;
+   |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: constant `MIN_SECRET_KEY_BYTES` is never used
+  --> src/protocol/core/binding.rs:10:7
+   |
+10 | const MIN_SECRET_KEY_BYTES: usize = 32;
+   |       ^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `validate_secret_key` is never used
+  --> src/protocol/core/binding.rs:17:15
+   |
+17 | pub(crate) fn validate_secret_key(secret_key: &str) -> crate::error::Result<()> {
+   |               ^^^^^^^^^^^^^^^^^^^
+
+warning: type alias `DynSigner` is never used
+   --> src/protocol/methods/tempo/mod.rs:102:17
+    |
+102 | pub(crate) type DynSigner = dyn alloy::signers::Signer + Send + Sync;
+    |                 ^^^^^^^^^
+
+warning: struct `ProofSource` is never constructed
+  --> src/protocol/methods/tempo/proof.rs:31:12
+   |
+31 | pub struct ProofSource {
+   |            ^^^^^^^^^^^
+
+warning: function `parse_proof_source` is never used
+  --> src/protocol/methods/tempo/proof.rs:41:8
+   |
+41 | pub fn parse_proof_source(source: &str) -> crate::error::Result<ProofSource> {
+   |        ^^^^^^^^^^^^^^^^^^
+
+warning: function `verify_proof` is never used
+   --> src/protocol/methods/tempo/proof.rs:127:8
+    |
+127 | pub fn verify_proof(
+    |        ^^^^^^^^^^^^
+
+warning: function `recover_proof_signer` is never used
+   --> src/protocol/methods/tempo/proof.rs:154:8
+    |
+154 | pub fn recover_proof_signer(
+    |        ^^^^^^^^^^^^^^^^^^^^
+
+warning: function `parse_signature` is never used
+   --> src/protocol/methods/tempo/proof.rs:174:4
+    |
+174 | fn parse_signature(signature_hex: &str) -> crate::error::Result<TempoSignature> {
+    |    ^^^^^^^^^^^^^^^
+
+warning: `mpp` (lib) generated 9 warnings (run `cargo fix --lib -p mpp` to apply 1 suggestion)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 16.59s
+
+info: running `cargo check --offline --no-default-features --features axum,sqlite` on mpp (56/127)
+    Checking alloy-transport v2.5.0
+    Checking commonware-cryptography v2026.9.0
+    Checking rusqlite v0.38.0
+    Checking alloy-transport-http v2.5.0
+    Checking alloy-rpc-client v2.5.0
+    Checking alloy-provider v2.5.0
+    Checking alloy-contract v2.5.0
+    Checking tempo-contracts v1.11.0
+    Checking alloy v2.5.0
+    Checking tempo-primitives v1.11.0
+    Checking tempo-chainspec v1.11.0
+    Checking tempo-alloy v1.11.0
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 12.48s
+
+info: running `cargo check --offline --no-default-features --features default,sqlite` on mpp (57/127)
+    Checking tokio v1.53.3
+    Checking rustls-platform-verifier v0.7.1
+    Checking commonware-cryptography v2026.9.0
+    Checking tower v0.5.3
+    Checking hyper v1.12.0
+    Checking tokio-rustls v0.26.6
+    Checking tokio-util v0.7.20
+    Checking tokio-stream v0.1.19
+    Checking tower-http v0.6.11
+    Checking alloy-transport v2.5.0
+    Checking hyper-util v0.1.21
+    Checking hyper-rustls v0.27.10
+    Checking reqwest v0.13.5
+    Checking alloy-transport-http v2.5.0
+    Checking alloy-rpc-client v2.5.0
+    Checking alloy-provider v2.5.0
+    Checking alloy-contract v2.5.0
+    Checking tempo-contracts v1.11.0
+    Checking alloy v2.5.0
+    Checking tempo-primitives v1.11.0
+    Checking tempo-chainspec v1.11.0
+    Checking tempo-alloy v1.11.0
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: unused import: `binding::validate_secret_key`
+  --> src/protocol/core/mod.rs:82:16
+   |
+82 | pub(crate) use binding::validate_secret_key;
+   |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: constant `MIN_SECRET_KEY_BYTES` is never used
+  --> src/protocol/core/binding.rs:10:7
+   |
+10 | const MIN_SECRET_KEY_BYTES: usize = 32;
+   |       ^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `validate_secret_key` is never used
+  --> src/protocol/core/binding.rs:17:15
+   |
+17 | pub(crate) fn validate_secret_key(secret_key: &str) -> crate::error::Result<()> {
+   |               ^^^^^^^^^^^^^^^^^^^
+
+warning: type alias `DynSigner` is never used
+   --> src/protocol/methods/tempo/mod.rs:102:17
+    |
+102 | pub(crate) type DynSigner = dyn alloy::signers::Signer + Send + Sync;
+    |                 ^^^^^^^^^
+
+warning: struct `ProofSource` is never constructed
+  --> src/protocol/methods/tempo/proof.rs:31:12
+   |
+31 | pub struct ProofSource {
+   |            ^^^^^^^^^^^
+
+warning: function `parse_proof_source` is never used
+  --> src/protocol/methods/tempo/proof.rs:41:8
+   |
+41 | pub fn parse_proof_source(source: &str) -> crate::error::Result<ProofSource> {
+   |        ^^^^^^^^^^^^^^^^^^
+
+warning: function `verify_proof` is never used
+   --> src/protocol/methods/tempo/proof.rs:127:8
+    |
+127 | pub fn verify_proof(
+    |        ^^^^^^^^^^^^
+
+warning: function `recover_proof_signer` is never used
+   --> src/protocol/methods/tempo/proof.rs:154:8
+    |
+154 | pub fn recover_proof_signer(
+    |        ^^^^^^^^^^^^^^^^^^^^
+
+warning: function `parse_signature` is never used
+   --> src/protocol/methods/tempo/proof.rs:174:4
+    |
+174 | fn parse_signature(signature_hex: &str) -> crate::error::Result<TempoSignature> {
+    |    ^^^^^^^^^^^^^^^
+
+warning: `mpp` (lib) generated 9 warnings (run `cargo fix --lib -p mpp` to apply 1 suggestion)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 13.94s
+
+info: running `cargo check --offline --no-default-features --features middleware,sqlite` on mpp (58/127)
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: unused import: `binding::validate_secret_key`
+  --> src/protocol/core/mod.rs:82:16
+   |
+82 | pub(crate) use binding::validate_secret_key;
+   |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: constant `MIN_SECRET_KEY_BYTES` is never used
+  --> src/protocol/core/binding.rs:10:7
+   |
+10 | const MIN_SECRET_KEY_BYTES: usize = 32;
+   |       ^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `validate_secret_key` is never used
+  --> src/protocol/core/binding.rs:17:15
+   |
+17 | pub(crate) fn validate_secret_key(secret_key: &str) -> crate::error::Result<()> {
+   |               ^^^^^^^^^^^^^^^^^^^
+
+warning: type alias `DynSigner` is never used
+   --> src/protocol/methods/tempo/mod.rs:102:17
+    |
+102 | pub(crate) type DynSigner = dyn alloy::signers::Signer + Send + Sync;
+    |                 ^^^^^^^^^
+
+warning: struct `ProofSource` is never constructed
+  --> src/protocol/methods/tempo/proof.rs:31:12
+   |
+31 | pub struct ProofSource {
+   |            ^^^^^^^^^^^
+
+warning: function `parse_proof_source` is never used
+  --> src/protocol/methods/tempo/proof.rs:41:8
+   |
+41 | pub fn parse_proof_source(source: &str) -> crate::error::Result<ProofSource> {
+   |        ^^^^^^^^^^^^^^^^^^
+
+warning: function `verify_proof` is never used
+   --> src/protocol/methods/tempo/proof.rs:127:8
+    |
+127 | pub fn verify_proof(
+    |        ^^^^^^^^^^^^
+
+warning: function `recover_proof_signer` is never used
+   --> src/protocol/methods/tempo/proof.rs:154:8
+    |
+154 | pub fn recover_proof_signer(
+    |        ^^^^^^^^^^^^^^^^^^^^
+
+warning: function `parse_signature` is never used
+   --> src/protocol/methods/tempo/proof.rs:174:4
+    |
+174 | fn parse_signature(signature_hex: &str) -> crate::error::Result<TempoSignature> {
+    |    ^^^^^^^^^^^^^^^
+
+warning: `mpp` (lib) generated 9 warnings (run `cargo fix --lib -p mpp` to apply 1 suggestion)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1.99s
+
+info: running `cargo check --offline --no-default-features --features reqwest-default-tls,sqlite` on mpp (59/127)
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: unused import: `binding::validate_secret_key`
+  --> src/protocol/core/mod.rs:82:16
+   |
+82 | pub(crate) use binding::validate_secret_key;
+   |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: constant `MIN_SECRET_KEY_BYTES` is never used
+  --> src/protocol/core/binding.rs:10:7
+   |
+10 | const MIN_SECRET_KEY_BYTES: usize = 32;
+   |       ^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `validate_secret_key` is never used
+  --> src/protocol/core/binding.rs:17:15
+   |
+17 | pub(crate) fn validate_secret_key(secret_key: &str) -> crate::error::Result<()> {
+   |               ^^^^^^^^^^^^^^^^^^^
+
+warning: type alias `DynSigner` is never used
+   --> src/protocol/methods/tempo/mod.rs:102:17
+    |
+102 | pub(crate) type DynSigner = dyn alloy::signers::Signer + Send + Sync;
+    |                 ^^^^^^^^^
+
+warning: struct `ProofSource` is never constructed
+  --> src/protocol/methods/tempo/proof.rs:31:12
+   |
+31 | pub struct ProofSource {
+   |            ^^^^^^^^^^^
+
+warning: function `parse_proof_source` is never used
+  --> src/protocol/methods/tempo/proof.rs:41:8
+   |
+41 | pub fn parse_proof_source(source: &str) -> crate::error::Result<ProofSource> {
+   |        ^^^^^^^^^^^^^^^^^^
+
+warning: function `verify_proof` is never used
+   --> src/protocol/methods/tempo/proof.rs:127:8
+    |
+127 | pub fn verify_proof(
+    |        ^^^^^^^^^^^^
+
+warning: function `recover_proof_signer` is never used
+   --> src/protocol/methods/tempo/proof.rs:154:8
+    |
+154 | pub fn recover_proof_signer(
+    |        ^^^^^^^^^^^^^^^^^^^^
+
+warning: function `parse_signature` is never used
+   --> src/protocol/methods/tempo/proof.rs:174:4
+    |
+174 | fn parse_signature(signature_hex: &str) -> crate::error::Result<TempoSignature> {
+    |    ^^^^^^^^^^^^^^^
+
+warning: `mpp` (lib) generated 9 warnings (run `cargo fix --lib -p mpp` to apply 1 suggestion)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1.88s
+
+info: running `cargo check --offline --no-default-features --features reqwest-native-tls,sqlite` on mpp (60/127)
+    Checking tokio-native-tls v0.3.1
+    Checking tower-http v0.6.11
+    Checking rusqlite v0.38.0
+    Checking hyper-tls v0.6.0
+    Checking reqwest v0.13.5
+    Checking alloy-transport-http v2.5.0
+    Checking alloy-rpc-client v2.5.0
+    Checking alloy-provider v2.5.0
+    Checking alloy-contract v2.5.0
+    Checking tempo-contracts v1.11.0
+    Checking alloy v2.5.0
+    Checking tempo-primitives v1.11.0
+    Checking tempo-chainspec v1.11.0
+    Checking tempo-alloy v1.11.0
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: unused import: `binding::validate_secret_key`
+  --> src/protocol/core/mod.rs:82:16
+   |
+82 | pub(crate) use binding::validate_secret_key;
+   |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: constant `MIN_SECRET_KEY_BYTES` is never used
+  --> src/protocol/core/binding.rs:10:7
+   |
+10 | const MIN_SECRET_KEY_BYTES: usize = 32;
+   |       ^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `validate_secret_key` is never used
+  --> src/protocol/core/binding.rs:17:15
+   |
+17 | pub(crate) fn validate_secret_key(secret_key: &str) -> crate::error::Result<()> {
+   |               ^^^^^^^^^^^^^^^^^^^
+
+warning: type alias `DynSigner` is never used
+   --> src/protocol/methods/tempo/mod.rs:102:17
+    |
+102 | pub(crate) type DynSigner = dyn alloy::signers::Signer + Send + Sync;
+    |                 ^^^^^^^^^
+
+warning: struct `ProofSource` is never constructed
+  --> src/protocol/methods/tempo/proof.rs:31:12
+   |
+31 | pub struct ProofSource {
+   |            ^^^^^^^^^^^
+
+warning: function `parse_proof_source` is never used
+  --> src/protocol/methods/tempo/proof.rs:41:8
+   |
+41 | pub fn parse_proof_source(source: &str) -> crate::error::Result<ProofSource> {
+   |        ^^^^^^^^^^^^^^^^^^
+
+warning: function `verify_proof` is never used
+   --> src/protocol/methods/tempo/proof.rs:127:8
+    |
+127 | pub fn verify_proof(
+    |        ^^^^^^^^^^^^
+
+warning: function `recover_proof_signer` is never used
+   --> src/protocol/methods/tempo/proof.rs:154:8
+    |
+154 | pub fn recover_proof_signer(
+    |        ^^^^^^^^^^^^^^^^^^^^
+
+warning: function `parse_signature` is never used
+   --> src/protocol/methods/tempo/proof.rs:174:4
+    |
+174 | fn parse_signature(signature_hex: &str) -> crate::error::Result<TempoSignature> {
+    |    ^^^^^^^^^^^^^^^
+
+warning: `mpp` (lib) generated 9 warnings (run `cargo fix --lib -p mpp` to apply 1 suggestion)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 11.81s
+
+info: running `cargo check --offline --no-default-features --features reqwest-rustls-tls,sqlite` on mpp (61/127)
+    Blocking waiting for file lock on build directory
+    Checking reqwest v0.13.5
+    Checking alloy-transport-http v2.5.0
+    Checking alloy-rpc-client v2.5.0
+    Checking alloy-provider v2.5.0
+    Checking alloy-contract v2.5.0
+    Checking tempo-contracts v1.11.0
+    Checking alloy v2.5.0
+    Checking tempo-primitives v1.11.0
+    Checking tempo-chainspec v1.11.0
+    Checking tempo-alloy v1.11.0
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: unused import: `binding::validate_secret_key`
+  --> src/protocol/core/mod.rs:82:16
+   |
+82 | pub(crate) use binding::validate_secret_key;
+   |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: constant `MIN_SECRET_KEY_BYTES` is never used
+  --> src/protocol/core/binding.rs:10:7
+   |
+10 | const MIN_SECRET_KEY_BYTES: usize = 32;
+   |       ^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `validate_secret_key` is never used
+  --> src/protocol/core/binding.rs:17:15
+   |
+17 | pub(crate) fn validate_secret_key(secret_key: &str) -> crate::error::Result<()> {
+   |               ^^^^^^^^^^^^^^^^^^^
+
+warning: type alias `DynSigner` is never used
+   --> src/protocol/methods/tempo/mod.rs:102:17
+    |
+102 | pub(crate) type DynSigner = dyn alloy::signers::Signer + Send + Sync;
+    |                 ^^^^^^^^^
+
+warning: struct `ProofSource` is never constructed
+  --> src/protocol/methods/tempo/proof.rs:31:12
+   |
+31 | pub struct ProofSource {
+   |            ^^^^^^^^^^^
+
+warning: function `parse_proof_source` is never used
+  --> src/protocol/methods/tempo/proof.rs:41:8
+   |
+41 | pub fn parse_proof_source(source: &str) -> crate::error::Result<ProofSource> {
+   |        ^^^^^^^^^^^^^^^^^^
+
+warning: function `verify_proof` is never used
+   --> src/protocol/methods/tempo/proof.rs:127:8
+    |
+127 | pub fn verify_proof(
+    |        ^^^^^^^^^^^^
+
+warning: function `recover_proof_signer` is never used
+   --> src/protocol/methods/tempo/proof.rs:154:8
+    |
+154 | pub fn recover_proof_signer(
+    |        ^^^^^^^^^^^^^^^^^^^^
+
+warning: function `parse_signature` is never used
+   --> src/protocol/methods/tempo/proof.rs:174:4
+    |
+174 | fn parse_signature(signature_hex: &str) -> crate::error::Result<TempoSignature> {
+    |    ^^^^^^^^^^^^^^^
+
+warning: `mpp` (lib) generated 9 warnings (run `cargo fix --lib -p mpp` to apply 1 suggestion)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 24.38s
+
+info: running `cargo check --offline --no-default-features --features reqwest-rustls-tls-no-provider,sqlite` on mpp (62/127)
+    Checking rustls-webpki v0.103.15
+    Checking rustls v0.23.46
+    Checking tokio-rustls v0.26.6
+    Checking rustls-platform-verifier v0.7.1
+    Checking hyper-rustls v0.27.10
+    Checking reqwest v0.13.5
+    Checking alloy-transport-http v2.5.0
+    Checking alloy-rpc-client v2.5.0
+    Checking alloy-provider v2.5.0
+    Checking alloy-contract v2.5.0
+    Checking tempo-contracts v1.11.0
+    Checking alloy v2.5.0
+    Checking tempo-primitives v1.11.0
+    Checking tempo-chainspec v1.11.0
+    Checking tempo-alloy v1.11.0
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: unused import: `binding::validate_secret_key`
+  --> src/protocol/core/mod.rs:82:16
+   |
+82 | pub(crate) use binding::validate_secret_key;
+   |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: constant `MIN_SECRET_KEY_BYTES` is never used
+  --> src/protocol/core/binding.rs:10:7
+   |
+10 | const MIN_SECRET_KEY_BYTES: usize = 32;
+   |       ^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `validate_secret_key` is never used
+  --> src/protocol/core/binding.rs:17:15
+   |
+17 | pub(crate) fn validate_secret_key(secret_key: &str) -> crate::error::Result<()> {
+   |               ^^^^^^^^^^^^^^^^^^^
+
+warning: type alias `DynSigner` is never used
+   --> src/protocol/methods/tempo/mod.rs:102:17
+    |
+102 | pub(crate) type DynSigner = dyn alloy::signers::Signer + Send + Sync;
+    |                 ^^^^^^^^^
+
+warning: struct `ProofSource` is never constructed
+  --> src/protocol/methods/tempo/proof.rs:31:12
+   |
+31 | pub struct ProofSource {
+   |            ^^^^^^^^^^^
+
+warning: function `parse_proof_source` is never used
+  --> src/protocol/methods/tempo/proof.rs:41:8
+   |
+41 | pub fn parse_proof_source(source: &str) -> crate::error::Result<ProofSource> {
+   |        ^^^^^^^^^^^^^^^^^^
+
+warning: function `verify_proof` is never used
+   --> src/protocol/methods/tempo/proof.rs:127:8
+    |
+127 | pub fn verify_proof(
+    |        ^^^^^^^^^^^^
+
+warning: function `recover_proof_signer` is never used
+   --> src/protocol/methods/tempo/proof.rs:154:8
+    |
+154 | pub fn recover_proof_signer(
+    |        ^^^^^^^^^^^^^^^^^^^^
+
+warning: function `parse_signature` is never used
+   --> src/protocol/methods/tempo/proof.rs:174:4
+    |
+174 | fn parse_signature(signature_hex: &str) -> crate::error::Result<TempoSignature> {
+    |    ^^^^^^^^^^^^^^^
+
+warning: `mpp` (lib) generated 9 warnings (run `cargo fix --lib -p mpp` to apply 1 suggestion)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 11.39s
+
+info: running `cargo check --offline --no-default-features --features server,sqlite` on mpp (63/127)
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 2.26s
+
+info: running `cargo check --offline --no-default-features --features stripe` on mpp (64/127)
+    Checking serde_urlencoded v0.7.1
+    Checking url v2.5.8
+    Checking tower-http v0.6.11
+    Checking reqwest v0.13.5
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: trait `ResultExt` is never used
+   --> src/error.rs:340:18
+    |
+340 | pub(crate) trait ResultExt<T> {
+    |                  ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `mpp` (lib) generated 1 warning
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1.01s
+
+info: running `cargo check --offline --no-default-features --features axum,stripe` on mpp (65/127)
+    Checking serde_urlencoded v0.7.1
+    Checking url v2.5.8
+    Checking tower-http v0.6.11
+    Checking reqwest v0.13.5
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: trait `ResultExt` is never used
+   --> src/error.rs:340:18
+    |
+340 | pub(crate) trait ResultExt<T> {
+    |                  ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `mpp` (lib) generated 1 warning
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1.23s
+
+info: running `cargo check --offline --no-default-features --features client,stripe` on mpp (66/127)
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: method `mpp_http` is never used
+   --> src/error.rs:342:8
+    |
+340 | pub(crate) trait ResultExt<T> {
+    |                  --------- method in this trait
+341 |     /// Map the error into [`MppError::Http`] with the given context prefix.
+342 |     fn mpp_http(self, context: &str) -> std::result::Result<T, MppError>;
+    |        ^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `mpp` (lib) generated 1 warning
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.66s
+
+info: running `cargo check --offline --no-default-features --features default,stripe` on mpp (67/127)
+    Checking tower-http v0.6.11
+    Checking reqwest v0.13.5
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: trait `ResultExt` is never used
+   --> src/error.rs:340:18
+    |
+340 | pub(crate) trait ResultExt<T> {
+    |                  ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `mpp` (lib) generated 1 warning
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.87s
+
+info: running `cargo check --offline --no-default-features --features evm,stripe` on mpp (68/127)
+    Checking url v2.5.8
+    Checking serde_urlencoded v0.7.1
+    Checking tower-http v0.6.11
+    Checking alloy-transport v2.5.0
+    Checking reqwest v0.13.5
+    Checking alloy-transport-http v2.5.0
+    Checking alloy-rpc-client v2.5.0
+    Checking alloy-provider v2.5.0
+    Checking alloy-contract v2.5.0
+    Checking alloy v2.5.0
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: trait `ResultExt` is never used
+   --> src/error.rs:340:18
+    |
+340 | pub(crate) trait ResultExt<T> {
+    |                  ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `mpp` (lib) generated 1 warning
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 2.86s
+
+info: running `cargo check --offline --no-default-features --features middleware,stripe` on mpp (69/127)
+    Checking serde_urlencoded v0.7.1
+    Checking url v2.5.8
+    Checking tower-http v0.6.11
+    Checking reqwest v0.13.5
+    Checking reqwest-middleware v0.5.2
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: method `mpp_http` is never used
+   --> src/error.rs:342:8
+    |
+340 | pub(crate) trait ResultExt<T> {
+    |                  --------- method in this trait
+341 |     /// Map the error into [`MppError::Http`] with the given context prefix.
+342 |     fn mpp_http(self, context: &str) -> std::result::Result<T, MppError>;
+    |        ^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `mpp` (lib) generated 1 warning
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1.18s
+
+info: running `cargo check --offline --no-default-features --features reqwest-default-tls,stripe` on mpp (70/127)
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: trait `ResultExt` is never used
+   --> src/error.rs:340:18
+    |
+340 | pub(crate) trait ResultExt<T> {
+    |                  ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `mpp` (lib) generated 1 warning
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.47s
+
+info: running `cargo check --offline --no-default-features --features reqwest-native-tls,stripe` on mpp (71/127)
+    Checking tower-http v0.6.11
+    Checking reqwest v0.13.5
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: trait `ResultExt` is never used
+   --> src/error.rs:340:18
+    |
+340 | pub(crate) trait ResultExt<T> {
+    |                  ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `mpp` (lib) generated 1 warning
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.76s
+
+info: running `cargo check --offline --no-default-features --features reqwest-rustls-tls,stripe` on mpp (72/127)
+    Checking reqwest v0.13.5
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: trait `ResultExt` is never used
+   --> src/error.rs:340:18
+    |
+340 | pub(crate) trait ResultExt<T> {
+    |                  ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `mpp` (lib) generated 1 warning
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.70s
+
+info: running `cargo check --offline --no-default-features --features reqwest-rustls-tls-no-provider,stripe` on mpp (73/127)
+    Checking reqwest v0.13.5
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: trait `ResultExt` is never used
+   --> src/error.rs:340:18
+    |
+340 | pub(crate) trait ResultExt<T> {
+    |                  ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `mpp` (lib) generated 1 warning
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.78s
+
+info: running `cargo check --offline --no-default-features --features server,stripe` on mpp (74/127)
+    Checking serde_urlencoded v0.7.1
+    Checking reqwest v0.13.5
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: trait `ResultExt` is never used
+   --> src/error.rs:340:18
+    |
+340 | pub(crate) trait ResultExt<T> {
+    |                  ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `mpp` (lib) generated 1 warning
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.88s
+
+info: running `cargo check --offline --no-default-features --features sqlite,stripe` on mpp (75/127)
+    Checking alloy-transport v2.5.0
+    Checking alloy-transport-http v2.5.0
+    Checking alloy-rpc-client v2.5.0
+    Checking alloy-provider v2.5.0
+    Checking alloy-contract v2.5.0
+    Checking tempo-contracts v1.11.0
+    Checking alloy v2.5.0
+    Checking tempo-primitives v1.11.0
+    Checking tempo-chainspec v1.11.0
+    Checking tempo-alloy v1.11.0
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: unused import: `binding::validate_secret_key`
+  --> src/protocol/core/mod.rs:82:16
+   |
+82 | pub(crate) use binding::validate_secret_key;
+   |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: constant `MIN_SECRET_KEY_BYTES` is never used
+  --> src/protocol/core/binding.rs:10:7
+   |
+10 | const MIN_SECRET_KEY_BYTES: usize = 32;
+   |       ^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `validate_secret_key` is never used
+  --> src/protocol/core/binding.rs:17:15
+   |
+17 | pub(crate) fn validate_secret_key(secret_key: &str) -> crate::error::Result<()> {
+   |               ^^^^^^^^^^^^^^^^^^^
+
+warning: type alias `DynSigner` is never used
+   --> src/protocol/methods/tempo/mod.rs:102:17
+    |
+102 | pub(crate) type DynSigner = dyn alloy::signers::Signer + Send + Sync;
+    |                 ^^^^^^^^^
+
+warning: struct `ProofSource` is never constructed
+  --> src/protocol/methods/tempo/proof.rs:31:12
+   |
+31 | pub struct ProofSource {
+   |            ^^^^^^^^^^^
+
+warning: function `parse_proof_source` is never used
+  --> src/protocol/methods/tempo/proof.rs:41:8
+   |
+41 | pub fn parse_proof_source(source: &str) -> crate::error::Result<ProofSource> {
+   |        ^^^^^^^^^^^^^^^^^^
+
+warning: function `verify_proof` is never used
+   --> src/protocol/methods/tempo/proof.rs:127:8
+    |
+127 | pub fn verify_proof(
+    |        ^^^^^^^^^^^^
+
+warning: function `recover_proof_signer` is never used
+   --> src/protocol/methods/tempo/proof.rs:154:8
+    |
+154 | pub fn recover_proof_signer(
+    |        ^^^^^^^^^^^^^^^^^^^^
+
+warning: function `parse_signature` is never used
+   --> src/protocol/methods/tempo/proof.rs:174:4
+    |
+174 | fn parse_signature(signature_hex: &str) -> crate::error::Result<TempoSignature> {
+    |    ^^^^^^^^^^^^^^^
+
+warning: `mpp` (lib) generated 9 warnings (run `cargo fix --lib -p mpp` to apply 1 suggestion)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 10.21s
+
+info: running `cargo check --offline --no-default-features --features tempo` on mpp (76/127)
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: unused import: `binding::validate_secret_key`
+  --> src/protocol/core/mod.rs:82:16
+   |
+82 | pub(crate) use binding::validate_secret_key;
+   |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: trait `ResultExt` is never used
+   --> src/error.rs:340:18
+    |
+340 | pub(crate) trait ResultExt<T> {
+    |                  ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: constant `MIN_SECRET_KEY_BYTES` is never used
+  --> src/protocol/core/binding.rs:10:7
+   |
+10 | const MIN_SECRET_KEY_BYTES: usize = 32;
+   |       ^^^^^^^^^^^^^^^^^^^^
+
+warning: function `validate_secret_key` is never used
+  --> src/protocol/core/binding.rs:17:15
+   |
+17 | pub(crate) fn validate_secret_key(secret_key: &str) -> crate::error::Result<()> {
+   |               ^^^^^^^^^^^^^^^^^^^
+
+warning: type alias `DynSigner` is never used
+   --> src/protocol/methods/tempo/mod.rs:102:17
+    |
+102 | pub(crate) type DynSigner = dyn alloy::signers::Signer + Send + Sync;
+    |                 ^^^^^^^^^
+
+warning: constant `DOMAIN_NAME` is never used
+  --> src/protocol/methods/tempo/proof.rs:11:11
+   |
+11 | pub const DOMAIN_NAME: &str = "MPP";
+   |           ^^^^^^^^^^^
+
+warning: constant `DOMAIN_VERSION` is never used
+  --> src/protocol/methods/tempo/proof.rs:14:11
+   |
+14 | pub const DOMAIN_VERSION: &str = "3";
+   |           ^^^^^^^^^^^^^^
+
+warning: function `proof_source` is never used
+  --> src/protocol/methods/tempo/proof.rs:26:8
+   |
+26 | pub fn proof_source(address: Address, chain_id: u64) -> String {
+   |        ^^^^^^^^^^^^
+
+warning: struct `ProofSource` is never constructed
+  --> src/protocol/methods/tempo/proof.rs:31:12
+   |
+31 | pub struct ProofSource {
+   |            ^^^^^^^^^^^
+
+warning: function `parse_proof_source` is never used
+  --> src/protocol/methods/tempo/proof.rs:41:8
+   |
+41 | pub fn parse_proof_source(source: &str) -> crate::error::Result<ProofSource> {
+   |        ^^^^^^^^^^^^^^^^^^
+
+warning: function `signing_hash` is never used
+  --> src/protocol/methods/tempo/proof.rs:71:8
+   |
+71 | pub fn signing_hash(account: Address, chain_id: u64, challenge_id: &str, realm: &str) -> B256 {
+   |        ^^^^^^^^^^^^
+
+warning: function `sign_proof` is never used
+  --> src/protocol/methods/tempo/proof.rs:88:14
+   |
+88 | pub async fn sign_proof(
+   |              ^^^^^^^^^^
+
+warning: function `sign_proof_primitive` is never used
+   --> src/protocol/methods/tempo/proof.rs:110:14
+    |
+110 | pub async fn sign_proof_primitive(
+    |              ^^^^^^^^^^^^^^^^^^^^
+
+warning: function `verify_proof` is never used
+   --> src/protocol/methods/tempo/proof.rs:127:8
+    |
+127 | pub fn verify_proof(
+    |        ^^^^^^^^^^^^
+
+warning: function `recover_proof_signer` is never used
+   --> src/protocol/methods/tempo/proof.rs:154:8
+    |
+154 | pub fn recover_proof_signer(
+    |        ^^^^^^^^^^^^^^^^^^^^
+
+warning: function `parse_signature` is never used
+   --> src/protocol/methods/tempo/proof.rs:174:4
+    |
+174 | fn parse_signature(signature_hex: &str) -> crate::error::Result<TempoSignature> {
+    |    ^^^^^^^^^^^^^^^
+
+warning: `mpp` (lib) generated 16 warnings (run `cargo fix --lib -p mpp` to apply 1 suggestion)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.86s
+
+info: running `cargo check --offline --no-default-features --features axum,tempo` on mpp (77/127)
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: trait `ResultExt` is never used
+   --> src/error.rs:340:18
+    |
+340 | pub(crate) trait ResultExt<T> {
+    |                  ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `sign_proof` is never used
+  --> src/protocol/methods/tempo/proof.rs:88:14
+   |
+88 | pub async fn sign_proof(
+   |              ^^^^^^^^^^
+
+warning: function `sign_proof_primitive` is never used
+   --> src/protocol/methods/tempo/proof.rs:110:14
+    |
+110 | pub async fn sign_proof_primitive(
+    |              ^^^^^^^^^^^^^^^^^^^^
+
+warning: `mpp` (lib) generated 3 warnings
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1.55s
+
+info: running `cargo check --offline --no-default-features --features client,tempo` on mpp (78/127)
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: unused import: `binding::validate_secret_key`
+  --> src/protocol/core/mod.rs:82:16
+   |
+82 | pub(crate) use binding::validate_secret_key;
+   |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: constant `MIN_SECRET_KEY_BYTES` is never used
+  --> src/protocol/core/binding.rs:10:7
+   |
+10 | const MIN_SECRET_KEY_BYTES: usize = 32;
+   |       ^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `validate_secret_key` is never used
+  --> src/protocol/core/binding.rs:17:15
+   |
+17 | pub(crate) fn validate_secret_key(secret_key: &str) -> crate::error::Result<()> {
+   |               ^^^^^^^^^^^^^^^^^^^
+
+warning: type alias `DynSigner` is never used
+   --> src/protocol/methods/tempo/mod.rs:102:17
+    |
+102 | pub(crate) type DynSigner = dyn alloy::signers::Signer + Send + Sync;
+    |                 ^^^^^^^^^
+
+warning: struct `ProofSource` is never constructed
+  --> src/protocol/methods/tempo/proof.rs:31:12
+   |
+31 | pub struct ProofSource {
+   |            ^^^^^^^^^^^
+
+warning: function `parse_proof_source` is never used
+  --> src/protocol/methods/tempo/proof.rs:41:8
+   |
+41 | pub fn parse_proof_source(source: &str) -> crate::error::Result<ProofSource> {
+   |        ^^^^^^^^^^^^^^^^^^
+
+warning: function `verify_proof` is never used
+   --> src/protocol/methods/tempo/proof.rs:127:8
+    |
+127 | pub fn verify_proof(
+    |        ^^^^^^^^^^^^
+
+warning: function `recover_proof_signer` is never used
+   --> src/protocol/methods/tempo/proof.rs:154:8
+    |
+154 | pub fn recover_proof_signer(
+    |        ^^^^^^^^^^^^^^^^^^^^
+
+warning: function `parse_signature` is never used
+   --> src/protocol/methods/tempo/proof.rs:174:4
+    |
+174 | fn parse_signature(signature_hex: &str) -> crate::error::Result<TempoSignature> {
+    |    ^^^^^^^^^^^^^^^
+
+warning: `mpp` (lib) generated 9 warnings (run `cargo fix --lib -p mpp` to apply 1 suggestion)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1.51s
+
+info: running `cargo check --offline --no-default-features --features default,tempo` on mpp (79/127)
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: unused import: `binding::validate_secret_key`
+  --> src/protocol/core/mod.rs:82:16
+   |
+82 | pub(crate) use binding::validate_secret_key;
+   |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: trait `ResultExt` is never used
+   --> src/error.rs:340:18
+    |
+340 | pub(crate) trait ResultExt<T> {
+    |                  ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: constant `MIN_SECRET_KEY_BYTES` is never used
+  --> src/protocol/core/binding.rs:10:7
+   |
+10 | const MIN_SECRET_KEY_BYTES: usize = 32;
+   |       ^^^^^^^^^^^^^^^^^^^^
+
+warning: function `validate_secret_key` is never used
+  --> src/protocol/core/binding.rs:17:15
+   |
+17 | pub(crate) fn validate_secret_key(secret_key: &str) -> crate::error::Result<()> {
+   |               ^^^^^^^^^^^^^^^^^^^
+
+warning: type alias `DynSigner` is never used
+   --> src/protocol/methods/tempo/mod.rs:102:17
+    |
+102 | pub(crate) type DynSigner = dyn alloy::signers::Signer + Send + Sync;
+    |                 ^^^^^^^^^
+
+warning: constant `DOMAIN_NAME` is never used
+  --> src/protocol/methods/tempo/proof.rs:11:11
+   |
+11 | pub const DOMAIN_NAME: &str = "MPP";
+   |           ^^^^^^^^^^^
+
+warning: constant `DOMAIN_VERSION` is never used
+  --> src/protocol/methods/tempo/proof.rs:14:11
+   |
+14 | pub const DOMAIN_VERSION: &str = "3";
+   |           ^^^^^^^^^^^^^^
+
+warning: function `proof_source` is never used
+  --> src/protocol/methods/tempo/proof.rs:26:8
+   |
+26 | pub fn proof_source(address: Address, chain_id: u64) -> String {
+   |        ^^^^^^^^^^^^
+
+warning: struct `ProofSource` is never constructed
+  --> src/protocol/methods/tempo/proof.rs:31:12
+   |
+31 | pub struct ProofSource {
+   |            ^^^^^^^^^^^
+
+warning: function `parse_proof_source` is never used
+  --> src/protocol/methods/tempo/proof.rs:41:8
+   |
+41 | pub fn parse_proof_source(source: &str) -> crate::error::Result<ProofSource> {
+   |        ^^^^^^^^^^^^^^^^^^
+
+warning: function `signing_hash` is never used
+  --> src/protocol/methods/tempo/proof.rs:71:8
+   |
+71 | pub fn signing_hash(account: Address, chain_id: u64, challenge_id: &str, realm: &str) -> B256 {
+   |        ^^^^^^^^^^^^
+
+warning: function `sign_proof` is never used
+  --> src/protocol/methods/tempo/proof.rs:88:14
+   |
+88 | pub async fn sign_proof(
+   |              ^^^^^^^^^^
+
+warning: function `sign_proof_primitive` is never used
+   --> src/protocol/methods/tempo/proof.rs:110:14
+    |
+110 | pub async fn sign_proof_primitive(
+    |              ^^^^^^^^^^^^^^^^^^^^
+
+warning: function `verify_proof` is never used
+   --> src/protocol/methods/tempo/proof.rs:127:8
+    |
+127 | pub fn verify_proof(
+    |        ^^^^^^^^^^^^
+
+warning: function `recover_proof_signer` is never used
+   --> src/protocol/methods/tempo/proof.rs:154:8
+    |
+154 | pub fn recover_proof_signer(
+    |        ^^^^^^^^^^^^^^^^^^^^
+
+warning: function `parse_signature` is never used
+   --> src/protocol/methods/tempo/proof.rs:174:4
+    |
+174 | fn parse_signature(signature_hex: &str) -> crate::error::Result<TempoSignature> {
+    |    ^^^^^^^^^^^^^^^
+
+warning: `mpp` (lib) generated 16 warnings (run `cargo fix --lib -p mpp` to apply 1 suggestion)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.88s
+
+info: running `cargo check --offline --no-default-features --features middleware,tempo` on mpp (80/127)
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: unused import: `binding::validate_secret_key`
+  --> src/protocol/core/mod.rs:82:16
+   |
+82 | pub(crate) use binding::validate_secret_key;
+   |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: constant `MIN_SECRET_KEY_BYTES` is never used
+  --> src/protocol/core/binding.rs:10:7
+   |
+10 | const MIN_SECRET_KEY_BYTES: usize = 32;
+   |       ^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `validate_secret_key` is never used
+  --> src/protocol/core/binding.rs:17:15
+   |
+17 | pub(crate) fn validate_secret_key(secret_key: &str) -> crate::error::Result<()> {
+   |               ^^^^^^^^^^^^^^^^^^^
+
+warning: type alias `DynSigner` is never used
+   --> src/protocol/methods/tempo/mod.rs:102:17
+    |
+102 | pub(crate) type DynSigner = dyn alloy::signers::Signer + Send + Sync;
+    |                 ^^^^^^^^^
+
+warning: struct `ProofSource` is never constructed
+  --> src/protocol/methods/tempo/proof.rs:31:12
+   |
+31 | pub struct ProofSource {
+   |            ^^^^^^^^^^^
+
+warning: function `parse_proof_source` is never used
+  --> src/protocol/methods/tempo/proof.rs:41:8
+   |
+41 | pub fn parse_proof_source(source: &str) -> crate::error::Result<ProofSource> {
+   |        ^^^^^^^^^^^^^^^^^^
+
+warning: function `verify_proof` is never used
+   --> src/protocol/methods/tempo/proof.rs:127:8
+    |
+127 | pub fn verify_proof(
+    |        ^^^^^^^^^^^^
+
+warning: function `recover_proof_signer` is never used
+   --> src/protocol/methods/tempo/proof.rs:154:8
+    |
+154 | pub fn recover_proof_signer(
+    |        ^^^^^^^^^^^^^^^^^^^^
+
+warning: function `parse_signature` is never used
+   --> src/protocol/methods/tempo/proof.rs:174:4
+    |
+174 | fn parse_signature(signature_hex: &str) -> crate::error::Result<TempoSignature> {
+    |    ^^^^^^^^^^^^^^^
+
+warning: `mpp` (lib) generated 9 warnings (run `cargo fix --lib -p mpp` to apply 1 suggestion)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1.55s
+
+info: running `cargo check --offline --no-default-features --features reqwest-default-tls,tempo` on mpp (81/127)
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: unused import: `binding::validate_secret_key`
+  --> src/protocol/core/mod.rs:82:16
+   |
+82 | pub(crate) use binding::validate_secret_key;
+   |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: trait `ResultExt` is never used
+   --> src/error.rs:340:18
+    |
+340 | pub(crate) trait ResultExt<T> {
+    |                  ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: constant `MIN_SECRET_KEY_BYTES` is never used
+  --> src/protocol/core/binding.rs:10:7
+   |
+10 | const MIN_SECRET_KEY_BYTES: usize = 32;
+   |       ^^^^^^^^^^^^^^^^^^^^
+
+warning: function `validate_secret_key` is never used
+  --> src/protocol/core/binding.rs:17:15
+   |
+17 | pub(crate) fn validate_secret_key(secret_key: &str) -> crate::error::Result<()> {
+   |               ^^^^^^^^^^^^^^^^^^^
+
+warning: type alias `DynSigner` is never used
+   --> src/protocol/methods/tempo/mod.rs:102:17
+    |
+102 | pub(crate) type DynSigner = dyn alloy::signers::Signer + Send + Sync;
+    |                 ^^^^^^^^^
+
+warning: constant `DOMAIN_NAME` is never used
+  --> src/protocol/methods/tempo/proof.rs:11:11
+   |
+11 | pub const DOMAIN_NAME: &str = "MPP";
+   |           ^^^^^^^^^^^
+
+warning: constant `DOMAIN_VERSION` is never used
+  --> src/protocol/methods/tempo/proof.rs:14:11
+   |
+14 | pub const DOMAIN_VERSION: &str = "3";
+   |           ^^^^^^^^^^^^^^
+
+warning: function `proof_source` is never used
+  --> src/protocol/methods/tempo/proof.rs:26:8
+   |
+26 | pub fn proof_source(address: Address, chain_id: u64) -> String {
+   |        ^^^^^^^^^^^^
+
+warning: struct `ProofSource` is never constructed
+  --> src/protocol/methods/tempo/proof.rs:31:12
+   |
+31 | pub struct ProofSource {
+   |            ^^^^^^^^^^^
+
+warning: function `parse_proof_source` is never used
+  --> src/protocol/methods/tempo/proof.rs:41:8
+   |
+41 | pub fn parse_proof_source(source: &str) -> crate::error::Result<ProofSource> {
+   |        ^^^^^^^^^^^^^^^^^^
+
+warning: function `signing_hash` is never used
+  --> src/protocol/methods/tempo/proof.rs:71:8
+   |
+71 | pub fn signing_hash(account: Address, chain_id: u64, challenge_id: &str, realm: &str) -> B256 {
+   |        ^^^^^^^^^^^^
+
+warning: function `sign_proof` is never used
+  --> src/protocol/methods/tempo/proof.rs:88:14
+   |
+88 | pub async fn sign_proof(
+   |              ^^^^^^^^^^
+
+warning: function `sign_proof_primitive` is never used
+   --> src/protocol/methods/tempo/proof.rs:110:14
+    |
+110 | pub async fn sign_proof_primitive(
+    |              ^^^^^^^^^^^^^^^^^^^^
+
+warning: function `verify_proof` is never used
+   --> src/protocol/methods/tempo/proof.rs:127:8
+    |
+127 | pub fn verify_proof(
+    |        ^^^^^^^^^^^^
+
+warning: function `recover_proof_signer` is never used
+   --> src/protocol/methods/tempo/proof.rs:154:8
+    |
+154 | pub fn recover_proof_signer(
+    |        ^^^^^^^^^^^^^^^^^^^^
+
+warning: function `parse_signature` is never used
+   --> src/protocol/methods/tempo/proof.rs:174:4
+    |
+174 | fn parse_signature(signature_hex: &str) -> crate::error::Result<TempoSignature> {
+    |    ^^^^^^^^^^^^^^^
+
+warning: `mpp` (lib) generated 16 warnings (run `cargo fix --lib -p mpp` to apply 1 suggestion)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.88s
+
+info: running `cargo check --offline --no-default-features --features reqwest-native-tls,tempo` on mpp (82/127)
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: unused import: `binding::validate_secret_key`
+  --> src/protocol/core/mod.rs:82:16
+   |
+82 | pub(crate) use binding::validate_secret_key;
+   |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: trait `ResultExt` is never used
+   --> src/error.rs:340:18
+    |
+340 | pub(crate) trait ResultExt<T> {
+    |                  ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: constant `MIN_SECRET_KEY_BYTES` is never used
+  --> src/protocol/core/binding.rs:10:7
+   |
+10 | const MIN_SECRET_KEY_BYTES: usize = 32;
+   |       ^^^^^^^^^^^^^^^^^^^^
+
+warning: function `validate_secret_key` is never used
+  --> src/protocol/core/binding.rs:17:15
+   |
+17 | pub(crate) fn validate_secret_key(secret_key: &str) -> crate::error::Result<()> {
+   |               ^^^^^^^^^^^^^^^^^^^
+
+warning: type alias `DynSigner` is never used
+   --> src/protocol/methods/tempo/mod.rs:102:17
+    |
+102 | pub(crate) type DynSigner = dyn alloy::signers::Signer + Send + Sync;
+    |                 ^^^^^^^^^
+
+warning: constant `DOMAIN_NAME` is never used
+  --> src/protocol/methods/tempo/proof.rs:11:11
+   |
+11 | pub const DOMAIN_NAME: &str = "MPP";
+   |           ^^^^^^^^^^^
+
+warning: constant `DOMAIN_VERSION` is never used
+  --> src/protocol/methods/tempo/proof.rs:14:11
+   |
+14 | pub const DOMAIN_VERSION: &str = "3";
+   |           ^^^^^^^^^^^^^^
+
+warning: function `proof_source` is never used
+  --> src/protocol/methods/tempo/proof.rs:26:8
+   |
+26 | pub fn proof_source(address: Address, chain_id: u64) -> String {
+   |        ^^^^^^^^^^^^
+
+warning: struct `ProofSource` is never constructed
+  --> src/protocol/methods/tempo/proof.rs:31:12
+   |
+31 | pub struct ProofSource {
+   |            ^^^^^^^^^^^
+
+warning: function `parse_proof_source` is never used
+  --> src/protocol/methods/tempo/proof.rs:41:8
+   |
+41 | pub fn parse_proof_source(source: &str) -> crate::error::Result<ProofSource> {
+   |        ^^^^^^^^^^^^^^^^^^
+
+warning: function `signing_hash` is never used
+  --> src/protocol/methods/tempo/proof.rs:71:8
+   |
+71 | pub fn signing_hash(account: Address, chain_id: u64, challenge_id: &str, realm: &str) -> B256 {
+   |        ^^^^^^^^^^^^
+
+warning: function `sign_proof` is never used
+  --> src/protocol/methods/tempo/proof.rs:88:14
+   |
+88 | pub async fn sign_proof(
+   |              ^^^^^^^^^^
+
+warning: function `sign_proof_primitive` is never used
+   --> src/protocol/methods/tempo/proof.rs:110:14
+    |
+110 | pub async fn sign_proof_primitive(
+    |              ^^^^^^^^^^^^^^^^^^^^
+
+warning: function `verify_proof` is never used
+   --> src/protocol/methods/tempo/proof.rs:127:8
+    |
+127 | pub fn verify_proof(
+    |        ^^^^^^^^^^^^
+
+warning: function `recover_proof_signer` is never used
+   --> src/protocol/methods/tempo/proof.rs:154:8
+    |
+154 | pub fn recover_proof_signer(
+    |        ^^^^^^^^^^^^^^^^^^^^
+
+warning: function `parse_signature` is never used
+   --> src/protocol/methods/tempo/proof.rs:174:4
+    |
+174 | fn parse_signature(signature_hex: &str) -> crate::error::Result<TempoSignature> {
+    |    ^^^^^^^^^^^^^^^
+
+warning: `mpp` (lib) generated 16 warnings (run `cargo fix --lib -p mpp` to apply 1 suggestion)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.88s
+
+info: running `cargo check --offline --no-default-features --features reqwest-rustls-tls,tempo` on mpp (83/127)
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: unused import: `binding::validate_secret_key`
+  --> src/protocol/core/mod.rs:82:16
+   |
+82 | pub(crate) use binding::validate_secret_key;
+   |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: trait `ResultExt` is never used
+   --> src/error.rs:340:18
+    |
+340 | pub(crate) trait ResultExt<T> {
+    |                  ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: constant `MIN_SECRET_KEY_BYTES` is never used
+  --> src/protocol/core/binding.rs:10:7
+   |
+10 | const MIN_SECRET_KEY_BYTES: usize = 32;
+   |       ^^^^^^^^^^^^^^^^^^^^
+
+warning: function `validate_secret_key` is never used
+  --> src/protocol/core/binding.rs:17:15
+   |
+17 | pub(crate) fn validate_secret_key(secret_key: &str) -> crate::error::Result<()> {
+   |               ^^^^^^^^^^^^^^^^^^^
+
+warning: type alias `DynSigner` is never used
+   --> src/protocol/methods/tempo/mod.rs:102:17
+    |
+102 | pub(crate) type DynSigner = dyn alloy::signers::Signer + Send + Sync;
+    |                 ^^^^^^^^^
+
+warning: constant `DOMAIN_NAME` is never used
+  --> src/protocol/methods/tempo/proof.rs:11:11
+   |
+11 | pub const DOMAIN_NAME: &str = "MPP";
+   |           ^^^^^^^^^^^
+
+warning: constant `DOMAIN_VERSION` is never used
+  --> src/protocol/methods/tempo/proof.rs:14:11
+   |
+14 | pub const DOMAIN_VERSION: &str = "3";
+   |           ^^^^^^^^^^^^^^
+
+warning: function `proof_source` is never used
+  --> src/protocol/methods/tempo/proof.rs:26:8
+   |
+26 | pub fn proof_source(address: Address, chain_id: u64) -> String {
+   |        ^^^^^^^^^^^^
+
+warning: struct `ProofSource` is never constructed
+  --> src/protocol/methods/tempo/proof.rs:31:12
+   |
+31 | pub struct ProofSource {
+   |            ^^^^^^^^^^^
+
+warning: function `parse_proof_source` is never used
+  --> src/protocol/methods/tempo/proof.rs:41:8
+   |
+41 | pub fn parse_proof_source(source: &str) -> crate::error::Result<ProofSource> {
+   |        ^^^^^^^^^^^^^^^^^^
+
+warning: function `signing_hash` is never used
+  --> src/protocol/methods/tempo/proof.rs:71:8
+   |
+71 | pub fn signing_hash(account: Address, chain_id: u64, challenge_id: &str, realm: &str) -> B256 {
+   |        ^^^^^^^^^^^^
+
+warning: function `sign_proof` is never used
+  --> src/protocol/methods/tempo/proof.rs:88:14
+   |
+88 | pub async fn sign_proof(
+   |              ^^^^^^^^^^
+
+warning: function `sign_proof_primitive` is never used
+   --> src/protocol/methods/tempo/proof.rs:110:14
+    |
+110 | pub async fn sign_proof_primitive(
+    |              ^^^^^^^^^^^^^^^^^^^^
+
+warning: function `verify_proof` is never used
+   --> src/protocol/methods/tempo/proof.rs:127:8
+    |
+127 | pub fn verify_proof(
+    |        ^^^^^^^^^^^^
+
+warning: function `recover_proof_signer` is never used
+   --> src/protocol/methods/tempo/proof.rs:154:8
+    |
+154 | pub fn recover_proof_signer(
+    |        ^^^^^^^^^^^^^^^^^^^^
+
+warning: function `parse_signature` is never used
+   --> src/protocol/methods/tempo/proof.rs:174:4
+    |
+174 | fn parse_signature(signature_hex: &str) -> crate::error::Result<TempoSignature> {
+    |    ^^^^^^^^^^^^^^^
+
+warning: `mpp` (lib) generated 16 warnings (run `cargo fix --lib -p mpp` to apply 1 suggestion)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.87s
+
+info: running `cargo check --offline --no-default-features --features reqwest-rustls-tls-no-provider,tempo` on mpp (84/127)
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: unused import: `binding::validate_secret_key`
+  --> src/protocol/core/mod.rs:82:16
+   |
+82 | pub(crate) use binding::validate_secret_key;
+   |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: trait `ResultExt` is never used
+   --> src/error.rs:340:18
+    |
+340 | pub(crate) trait ResultExt<T> {
+    |                  ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: constant `MIN_SECRET_KEY_BYTES` is never used
+  --> src/protocol/core/binding.rs:10:7
+   |
+10 | const MIN_SECRET_KEY_BYTES: usize = 32;
+   |       ^^^^^^^^^^^^^^^^^^^^
+
+warning: function `validate_secret_key` is never used
+  --> src/protocol/core/binding.rs:17:15
+   |
+17 | pub(crate) fn validate_secret_key(secret_key: &str) -> crate::error::Result<()> {
+   |               ^^^^^^^^^^^^^^^^^^^
+
+warning: type alias `DynSigner` is never used
+   --> src/protocol/methods/tempo/mod.rs:102:17
+    |
+102 | pub(crate) type DynSigner = dyn alloy::signers::Signer + Send + Sync;
+    |                 ^^^^^^^^^
+
+warning: constant `DOMAIN_NAME` is never used
+  --> src/protocol/methods/tempo/proof.rs:11:11
+   |
+11 | pub const DOMAIN_NAME: &str = "MPP";
+   |           ^^^^^^^^^^^
+
+warning: constant `DOMAIN_VERSION` is never used
+  --> src/protocol/methods/tempo/proof.rs:14:11
+   |
+14 | pub const DOMAIN_VERSION: &str = "3";
+   |           ^^^^^^^^^^^^^^
+
+warning: function `proof_source` is never used
+  --> src/protocol/methods/tempo/proof.rs:26:8
+   |
+26 | pub fn proof_source(address: Address, chain_id: u64) -> String {
+   |        ^^^^^^^^^^^^
+
+warning: struct `ProofSource` is never constructed
+  --> src/protocol/methods/tempo/proof.rs:31:12
+   |
+31 | pub struct ProofSource {
+   |            ^^^^^^^^^^^
+
+warning: function `parse_proof_source` is never used
+  --> src/protocol/methods/tempo/proof.rs:41:8
+   |
+41 | pub fn parse_proof_source(source: &str) -> crate::error::Result<ProofSource> {
+   |        ^^^^^^^^^^^^^^^^^^
+
+warning: function `signing_hash` is never used
+  --> src/protocol/methods/tempo/proof.rs:71:8
+   |
+71 | pub fn signing_hash(account: Address, chain_id: u64, challenge_id: &str, realm: &str) -> B256 {
+   |        ^^^^^^^^^^^^
+
+warning: function `sign_proof` is never used
+  --> src/protocol/methods/tempo/proof.rs:88:14
+   |
+88 | pub async fn sign_proof(
+   |              ^^^^^^^^^^
+
+warning: function `sign_proof_primitive` is never used
+   --> src/protocol/methods/tempo/proof.rs:110:14
+    |
+110 | pub async fn sign_proof_primitive(
+    |              ^^^^^^^^^^^^^^^^^^^^
+
+warning: function `verify_proof` is never used
+   --> src/protocol/methods/tempo/proof.rs:127:8
+    |
+127 | pub fn verify_proof(
+    |        ^^^^^^^^^^^^
+
+warning: function `recover_proof_signer` is never used
+   --> src/protocol/methods/tempo/proof.rs:154:8
+    |
+154 | pub fn recover_proof_signer(
+    |        ^^^^^^^^^^^^^^^^^^^^
+
+warning: function `parse_signature` is never used
+   --> src/protocol/methods/tempo/proof.rs:174:4
+    |
+174 | fn parse_signature(signature_hex: &str) -> crate::error::Result<TempoSignature> {
+    |    ^^^^^^^^^^^^^^^
+
+warning: `mpp` (lib) generated 16 warnings (run `cargo fix --lib -p mpp` to apply 1 suggestion)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.85s
+
+info: running `cargo check --offline --no-default-features --features server,tempo` on mpp (85/127)
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: trait `ResultExt` is never used
+   --> src/error.rs:340:18
+    |
+340 | pub(crate) trait ResultExt<T> {
+    |                  ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `sign_proof` is never used
+  --> src/protocol/methods/tempo/proof.rs:88:14
+   |
+88 | pub async fn sign_proof(
+   |              ^^^^^^^^^^
+
+warning: function `sign_proof_primitive` is never used
+   --> src/protocol/methods/tempo/proof.rs:110:14
+    |
+110 | pub async fn sign_proof_primitive(
+    |              ^^^^^^^^^^^^^^^^^^^^
+
+warning: `mpp` (lib) generated 3 warnings
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1.44s
+
+info: running `cargo check --offline --no-default-features --features stripe,tempo` on mpp (86/127)
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: unused import: `binding::validate_secret_key`
+  --> src/protocol/core/mod.rs:82:16
+   |
+82 | pub(crate) use binding::validate_secret_key;
+   |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: trait `ResultExt` is never used
+   --> src/error.rs:340:18
+    |
+340 | pub(crate) trait ResultExt<T> {
+    |                  ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: constant `MIN_SECRET_KEY_BYTES` is never used
+  --> src/protocol/core/binding.rs:10:7
+   |
+10 | const MIN_SECRET_KEY_BYTES: usize = 32;
+   |       ^^^^^^^^^^^^^^^^^^^^
+
+warning: function `validate_secret_key` is never used
+  --> src/protocol/core/binding.rs:17:15
+   |
+17 | pub(crate) fn validate_secret_key(secret_key: &str) -> crate::error::Result<()> {
+   |               ^^^^^^^^^^^^^^^^^^^
+
+warning: type alias `DynSigner` is never used
+   --> src/protocol/methods/tempo/mod.rs:102:17
+    |
+102 | pub(crate) type DynSigner = dyn alloy::signers::Signer + Send + Sync;
+    |                 ^^^^^^^^^
+
+warning: constant `DOMAIN_NAME` is never used
+  --> src/protocol/methods/tempo/proof.rs:11:11
+   |
+11 | pub const DOMAIN_NAME: &str = "MPP";
+   |           ^^^^^^^^^^^
+
+warning: constant `DOMAIN_VERSION` is never used
+  --> src/protocol/methods/tempo/proof.rs:14:11
+   |
+14 | pub const DOMAIN_VERSION: &str = "3";
+   |           ^^^^^^^^^^^^^^
+
+warning: function `proof_source` is never used
+  --> src/protocol/methods/tempo/proof.rs:26:8
+   |
+26 | pub fn proof_source(address: Address, chain_id: u64) -> String {
+   |        ^^^^^^^^^^^^
+
+warning: struct `ProofSource` is never constructed
+  --> src/protocol/methods/tempo/proof.rs:31:12
+   |
+31 | pub struct ProofSource {
+   |            ^^^^^^^^^^^
+
+warning: function `parse_proof_source` is never used
+  --> src/protocol/methods/tempo/proof.rs:41:8
+   |
+41 | pub fn parse_proof_source(source: &str) -> crate::error::Result<ProofSource> {
+   |        ^^^^^^^^^^^^^^^^^^
+
+warning: function `signing_hash` is never used
+  --> src/protocol/methods/tempo/proof.rs:71:8
+   |
+71 | pub fn signing_hash(account: Address, chain_id: u64, challenge_id: &str, realm: &str) -> B256 {
+   |        ^^^^^^^^^^^^
+
+warning: function `sign_proof` is never used
+  --> src/protocol/methods/tempo/proof.rs:88:14
+   |
+88 | pub async fn sign_proof(
+   |              ^^^^^^^^^^
+
+warning: function `sign_proof_primitive` is never used
+   --> src/protocol/methods/tempo/proof.rs:110:14
+    |
+110 | pub async fn sign_proof_primitive(
+    |              ^^^^^^^^^^^^^^^^^^^^
+
+warning: function `verify_proof` is never used
+   --> src/protocol/methods/tempo/proof.rs:127:8
+    |
+127 | pub fn verify_proof(
+    |        ^^^^^^^^^^^^
+
+warning: function `recover_proof_signer` is never used
+   --> src/protocol/methods/tempo/proof.rs:154:8
+    |
+154 | pub fn recover_proof_signer(
+    |        ^^^^^^^^^^^^^^^^^^^^
+
+warning: function `parse_signature` is never used
+   --> src/protocol/methods/tempo/proof.rs:174:4
+    |
+174 | fn parse_signature(signature_hex: &str) -> crate::error::Result<TempoSignature> {
+    |    ^^^^^^^^^^^^^^^
+
+warning: `mpp` (lib) generated 16 warnings (run `cargo fix --lib -p mpp` to apply 1 suggestion)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.89s
+
+info: running `cargo check --offline --no-default-features --features tower` on mpp (87/127)
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: unused imports: `format_receipt`, `format_www_authenticate_many`, and `parse_authorization`
+  --> src/server/middleware.rs:43:29
+   |
+43 |     extract_payment_scheme, format_receipt, format_www_authenticate_many, parse_authorization,
+   |                             ^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: trait `ResultExt` is never used
+   --> src/error.rs:340:18
+    |
+340 | pub(crate) trait ResultExt<T> {
+    |                  ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: constant `SECRET_KEY_ENV_VAR` is never used
+  --> src/server/mpp.rs:35:7
+   |
+35 | const SECRET_KEY_ENV_VAR: &str = "MPP_SECRET_KEY";
+   |       ^^^^^^^^^^^^^^^^^^
+
+warning: constant `REALM_ENV_VARS` is never used
+  --> src/server/mpp.rs:43:7
+   |
+43 | const REALM_ENV_VARS: &[&str] = &[
+   |       ^^^^^^^^^^^^^^
+
+warning: constant `DEFAULT_REALM` is never used
+  --> src/server/mpp.rs:53:7
+   |
+53 | const DEFAULT_REALM: &str = "MPP Payment";
+   |       ^^^^^^^^^^^^^
+
+warning: function `detect_realm` is never used
+  --> src/server/mpp.rs:64:15
+   |
+64 | pub(crate) fn detect_realm() -> String {
+   |               ^^^^^^^^^^^^
+
+warning: function `realm_from_env` is never used
+  --> src/server/mpp.rs:68:4
+   |
+68 | fn realm_from_env(lookup: impl Fn(&str) -> Option<String>) -> String {
+   |    ^^^^^^^^^^^^^^
+
+warning: `mpp` (lib) generated 7 warnings (run `cargo fix --lib -p mpp` to apply 1 suggestion)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.59s
+
+info: running `cargo check --offline --no-default-features --features axum,tower` on mpp (88/127)
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: unused imports: `format_receipt`, `format_www_authenticate_many`, and `parse_authorization`
+  --> src/server/middleware.rs:43:29
+   |
+43 |     extract_payment_scheme, format_receipt, format_www_authenticate_many, parse_authorization,
+   |                             ^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: trait `ResultExt` is never used
+   --> src/error.rs:340:18
+    |
+340 | pub(crate) trait ResultExt<T> {
+    |                  ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: constant `SECRET_KEY_ENV_VAR` is never used
+  --> src/server/mpp.rs:35:7
+   |
+35 | const SECRET_KEY_ENV_VAR: &str = "MPP_SECRET_KEY";
+   |       ^^^^^^^^^^^^^^^^^^
+
+warning: constant `REALM_ENV_VARS` is never used
+  --> src/server/mpp.rs:43:7
+   |
+43 | const REALM_ENV_VARS: &[&str] = &[
+   |       ^^^^^^^^^^^^^^
+
+warning: constant `DEFAULT_REALM` is never used
+  --> src/server/mpp.rs:53:7
+   |
+53 | const DEFAULT_REALM: &str = "MPP Payment";
+   |       ^^^^^^^^^^^^^
+
+warning: function `detect_realm` is never used
+  --> src/server/mpp.rs:64:15
+   |
+64 | pub(crate) fn detect_realm() -> String {
+   |               ^^^^^^^^^^^^
+
+warning: function `realm_from_env` is never used
+  --> src/server/mpp.rs:68:4
+   |
+68 | fn realm_from_env(lookup: impl Fn(&str) -> Option<String>) -> String {
+   |    ^^^^^^^^^^^^^^
+
+warning: `mpp` (lib) generated 7 warnings (run `cargo fix --lib -p mpp` to apply 1 suggestion)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.63s
+
+info: running `cargo check --offline --no-default-features --features client,tower` on mpp (89/127)
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: unused imports: `format_receipt`, `format_www_authenticate_many`, and `parse_authorization`
+  --> src/server/middleware.rs:43:29
+   |
+43 |     extract_payment_scheme, format_receipt, format_www_authenticate_many, parse_authorization,
+   |                             ^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: trait `ResultExt` is never used
+   --> src/error.rs:340:18
+    |
+340 | pub(crate) trait ResultExt<T> {
+    |                  ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: constant `SECRET_KEY_ENV_VAR` is never used
+  --> src/server/mpp.rs:35:7
+   |
+35 | const SECRET_KEY_ENV_VAR: &str = "MPP_SECRET_KEY";
+   |       ^^^^^^^^^^^^^^^^^^
+
+warning: constant `REALM_ENV_VARS` is never used
+  --> src/server/mpp.rs:43:7
+   |
+43 | const REALM_ENV_VARS: &[&str] = &[
+   |       ^^^^^^^^^^^^^^
+
+warning: constant `DEFAULT_REALM` is never used
+  --> src/server/mpp.rs:53:7
+   |
+53 | const DEFAULT_REALM: &str = "MPP Payment";
+   |       ^^^^^^^^^^^^^
+
+warning: function `detect_realm` is never used
+  --> src/server/mpp.rs:64:15
+   |
+64 | pub(crate) fn detect_realm() -> String {
+   |               ^^^^^^^^^^^^
+
+warning: function `realm_from_env` is never used
+  --> src/server/mpp.rs:68:4
+   |
+68 | fn realm_from_env(lookup: impl Fn(&str) -> Option<String>) -> String {
+   |    ^^^^^^^^^^^^^^
+
+warning: `mpp` (lib) generated 7 warnings (run `cargo fix --lib -p mpp` to apply 1 suggestion)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.79s
+
+info: running `cargo check --offline --no-default-features --features default,tower` on mpp (90/127)
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: unused imports: `format_receipt`, `format_www_authenticate_many`, and `parse_authorization`
+  --> src/server/middleware.rs:43:29
+   |
+43 |     extract_payment_scheme, format_receipt, format_www_authenticate_many, parse_authorization,
+   |                             ^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: trait `ResultExt` is never used
+   --> src/error.rs:340:18
+    |
+340 | pub(crate) trait ResultExt<T> {
+    |                  ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: constant `SECRET_KEY_ENV_VAR` is never used
+  --> src/server/mpp.rs:35:7
+   |
+35 | const SECRET_KEY_ENV_VAR: &str = "MPP_SECRET_KEY";
+   |       ^^^^^^^^^^^^^^^^^^
+
+warning: constant `REALM_ENV_VARS` is never used
+  --> src/server/mpp.rs:43:7
+   |
+43 | const REALM_ENV_VARS: &[&str] = &[
+   |       ^^^^^^^^^^^^^^
+
+warning: constant `DEFAULT_REALM` is never used
+  --> src/server/mpp.rs:53:7
+   |
+53 | const DEFAULT_REALM: &str = "MPP Payment";
+   |       ^^^^^^^^^^^^^
+
+warning: function `detect_realm` is never used
+  --> src/server/mpp.rs:64:15
+   |
+64 | pub(crate) fn detect_realm() -> String {
+   |               ^^^^^^^^^^^^
+
+warning: function `realm_from_env` is never used
+  --> src/server/mpp.rs:68:4
+   |
+68 | fn realm_from_env(lookup: impl Fn(&str) -> Option<String>) -> String {
+   |    ^^^^^^^^^^^^^^
+
+warning: `mpp` (lib) generated 7 warnings (run `cargo fix --lib -p mpp` to apply 1 suggestion)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.63s
+
+info: running `cargo check --offline --no-default-features --features evm,tower` on mpp (91/127)
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: unused imports: `format_receipt`, `format_www_authenticate_many`, and `parse_authorization`
+  --> src/server/middleware.rs:43:29
+   |
+43 |     extract_payment_scheme, format_receipt, format_www_authenticate_many, parse_authorization,
+   |                             ^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: trait `ResultExt` is never used
+   --> src/error.rs:340:18
+    |
+340 | pub(crate) trait ResultExt<T> {
+    |                  ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: constant `SECRET_KEY_ENV_VAR` is never used
+  --> src/server/mpp.rs:35:7
+   |
+35 | const SECRET_KEY_ENV_VAR: &str = "MPP_SECRET_KEY";
+   |       ^^^^^^^^^^^^^^^^^^
+
+warning: constant `REALM_ENV_VARS` is never used
+  --> src/server/mpp.rs:43:7
+   |
+43 | const REALM_ENV_VARS: &[&str] = &[
+   |       ^^^^^^^^^^^^^^
+
+warning: constant `DEFAULT_REALM` is never used
+  --> src/server/mpp.rs:53:7
+   |
+53 | const DEFAULT_REALM: &str = "MPP Payment";
+   |       ^^^^^^^^^^^^^
+
+warning: function `detect_realm` is never used
+  --> src/server/mpp.rs:64:15
+   |
+64 | pub(crate) fn detect_realm() -> String {
+   |               ^^^^^^^^^^^^
+
+warning: function `realm_from_env` is never used
+  --> src/server/mpp.rs:68:4
+   |
+68 | fn realm_from_env(lookup: impl Fn(&str) -> Option<String>) -> String {
+   |    ^^^^^^^^^^^^^^
+
+warning: `mpp` (lib) generated 7 warnings (run `cargo fix --lib -p mpp` to apply 1 suggestion)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.85s
+
+info: running `cargo check --offline --no-default-features --features middleware,tower` on mpp (92/127)
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: unused imports: `format_receipt`, `format_www_authenticate_many`, and `parse_authorization`
+  --> src/server/middleware.rs:43:29
+   |
+43 |     extract_payment_scheme, format_receipt, format_www_authenticate_many, parse_authorization,
+   |                             ^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: trait `ResultExt` is never used
+   --> src/error.rs:340:18
+    |
+340 | pub(crate) trait ResultExt<T> {
+    |                  ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: constant `SECRET_KEY_ENV_VAR` is never used
+  --> src/server/mpp.rs:35:7
+   |
+35 | const SECRET_KEY_ENV_VAR: &str = "MPP_SECRET_KEY";
+   |       ^^^^^^^^^^^^^^^^^^
+
+warning: constant `REALM_ENV_VARS` is never used
+  --> src/server/mpp.rs:43:7
+   |
+43 | const REALM_ENV_VARS: &[&str] = &[
+   |       ^^^^^^^^^^^^^^
+
+warning: constant `DEFAULT_REALM` is never used
+  --> src/server/mpp.rs:53:7
+   |
+53 | const DEFAULT_REALM: &str = "MPP Payment";
+   |       ^^^^^^^^^^^^^
+
+warning: function `detect_realm` is never used
+  --> src/server/mpp.rs:64:15
+   |
+64 | pub(crate) fn detect_realm() -> String {
+   |               ^^^^^^^^^^^^
+
+warning: function `realm_from_env` is never used
+  --> src/server/mpp.rs:68:4
+   |
+68 | fn realm_from_env(lookup: impl Fn(&str) -> Option<String>) -> String {
+   |    ^^^^^^^^^^^^^^
+
+warning: `mpp` (lib) generated 7 warnings (run `cargo fix --lib -p mpp` to apply 1 suggestion)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.91s
+
+info: running `cargo check --offline --no-default-features --features reqwest-default-tls,tower` on mpp (93/127)
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: unused imports: `format_receipt`, `format_www_authenticate_many`, and `parse_authorization`
+  --> src/server/middleware.rs:43:29
+   |
+43 |     extract_payment_scheme, format_receipt, format_www_authenticate_many, parse_authorization,
+   |                             ^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: trait `ResultExt` is never used
+   --> src/error.rs:340:18
+    |
+340 | pub(crate) trait ResultExt<T> {
+    |                  ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: constant `SECRET_KEY_ENV_VAR` is never used
+  --> src/server/mpp.rs:35:7
+   |
+35 | const SECRET_KEY_ENV_VAR: &str = "MPP_SECRET_KEY";
+   |       ^^^^^^^^^^^^^^^^^^
+
+warning: constant `REALM_ENV_VARS` is never used
+  --> src/server/mpp.rs:43:7
+   |
+43 | const REALM_ENV_VARS: &[&str] = &[
+   |       ^^^^^^^^^^^^^^
+
+warning: constant `DEFAULT_REALM` is never used
+  --> src/server/mpp.rs:53:7
+   |
+53 | const DEFAULT_REALM: &str = "MPP Payment";
+   |       ^^^^^^^^^^^^^
+
+warning: function `detect_realm` is never used
+  --> src/server/mpp.rs:64:15
+   |
+64 | pub(crate) fn detect_realm() -> String {
+   |               ^^^^^^^^^^^^
+
+warning: function `realm_from_env` is never used
+  --> src/server/mpp.rs:68:4
+   |
+68 | fn realm_from_env(lookup: impl Fn(&str) -> Option<String>) -> String {
+   |    ^^^^^^^^^^^^^^
+
+warning: `mpp` (lib) generated 7 warnings (run `cargo fix --lib -p mpp` to apply 1 suggestion)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.60s
+
+info: running `cargo check --offline --no-default-features --features reqwest-native-tls,tower` on mpp (94/127)
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: unused imports: `format_receipt`, `format_www_authenticate_many`, and `parse_authorization`
+  --> src/server/middleware.rs:43:29
+   |
+43 |     extract_payment_scheme, format_receipt, format_www_authenticate_many, parse_authorization,
+   |                             ^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: trait `ResultExt` is never used
+   --> src/error.rs:340:18
+    |
+340 | pub(crate) trait ResultExt<T> {
+    |                  ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: constant `SECRET_KEY_ENV_VAR` is never used
+  --> src/server/mpp.rs:35:7
+   |
+35 | const SECRET_KEY_ENV_VAR: &str = "MPP_SECRET_KEY";
+   |       ^^^^^^^^^^^^^^^^^^
+
+warning: constant `REALM_ENV_VARS` is never used
+  --> src/server/mpp.rs:43:7
+   |
+43 | const REALM_ENV_VARS: &[&str] = &[
+   |       ^^^^^^^^^^^^^^
+
+warning: constant `DEFAULT_REALM` is never used
+  --> src/server/mpp.rs:53:7
+   |
+53 | const DEFAULT_REALM: &str = "MPP Payment";
+   |       ^^^^^^^^^^^^^
+
+warning: function `detect_realm` is never used
+  --> src/server/mpp.rs:64:15
+   |
+64 | pub(crate) fn detect_realm() -> String {
+   |               ^^^^^^^^^^^^
+
+warning: function `realm_from_env` is never used
+  --> src/server/mpp.rs:68:4
+   |
+68 | fn realm_from_env(lookup: impl Fn(&str) -> Option<String>) -> String {
+   |    ^^^^^^^^^^^^^^
+
+warning: `mpp` (lib) generated 7 warnings (run `cargo fix --lib -p mpp` to apply 1 suggestion)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.59s
+
+info: running `cargo check --offline --no-default-features --features reqwest-rustls-tls,tower` on mpp (95/127)
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: unused imports: `format_receipt`, `format_www_authenticate_many`, and `parse_authorization`
+  --> src/server/middleware.rs:43:29
+   |
+43 |     extract_payment_scheme, format_receipt, format_www_authenticate_many, parse_authorization,
+   |                             ^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: trait `ResultExt` is never used
+   --> src/error.rs:340:18
+    |
+340 | pub(crate) trait ResultExt<T> {
+    |                  ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: constant `SECRET_KEY_ENV_VAR` is never used
+  --> src/server/mpp.rs:35:7
+   |
+35 | const SECRET_KEY_ENV_VAR: &str = "MPP_SECRET_KEY";
+   |       ^^^^^^^^^^^^^^^^^^
+
+warning: constant `REALM_ENV_VARS` is never used
+  --> src/server/mpp.rs:43:7
+   |
+43 | const REALM_ENV_VARS: &[&str] = &[
+   |       ^^^^^^^^^^^^^^
+
+warning: constant `DEFAULT_REALM` is never used
+  --> src/server/mpp.rs:53:7
+   |
+53 | const DEFAULT_REALM: &str = "MPP Payment";
+   |       ^^^^^^^^^^^^^
+
+warning: function `detect_realm` is never used
+  --> src/server/mpp.rs:64:15
+   |
+64 | pub(crate) fn detect_realm() -> String {
+   |               ^^^^^^^^^^^^
+
+warning: function `realm_from_env` is never used
+  --> src/server/mpp.rs:68:4
+   |
+68 | fn realm_from_env(lookup: impl Fn(&str) -> Option<String>) -> String {
+   |    ^^^^^^^^^^^^^^
+
+warning: `mpp` (lib) generated 7 warnings (run `cargo fix --lib -p mpp` to apply 1 suggestion)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.61s
+
+info: running `cargo check --offline --no-default-features --features reqwest-rustls-tls-no-provider,tower` on mpp (96/127)
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: unused imports: `format_receipt`, `format_www_authenticate_many`, and `parse_authorization`
+  --> src/server/middleware.rs:43:29
+   |
+43 |     extract_payment_scheme, format_receipt, format_www_authenticate_many, parse_authorization,
+   |                             ^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: trait `ResultExt` is never used
+   --> src/error.rs:340:18
+    |
+340 | pub(crate) trait ResultExt<T> {
+    |                  ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: constant `SECRET_KEY_ENV_VAR` is never used
+  --> src/server/mpp.rs:35:7
+   |
+35 | const SECRET_KEY_ENV_VAR: &str = "MPP_SECRET_KEY";
+   |       ^^^^^^^^^^^^^^^^^^
+
+warning: constant `REALM_ENV_VARS` is never used
+  --> src/server/mpp.rs:43:7
+   |
+43 | const REALM_ENV_VARS: &[&str] = &[
+   |       ^^^^^^^^^^^^^^
+
+warning: constant `DEFAULT_REALM` is never used
+  --> src/server/mpp.rs:53:7
+   |
+53 | const DEFAULT_REALM: &str = "MPP Payment";
+   |       ^^^^^^^^^^^^^
+
+warning: function `detect_realm` is never used
+  --> src/server/mpp.rs:64:15
+   |
+64 | pub(crate) fn detect_realm() -> String {
+   |               ^^^^^^^^^^^^
+
+warning: function `realm_from_env` is never used
+  --> src/server/mpp.rs:68:4
+   |
+68 | fn realm_from_env(lookup: impl Fn(&str) -> Option<String>) -> String {
+   |    ^^^^^^^^^^^^^^
+
+warning: `mpp` (lib) generated 7 warnings (run `cargo fix --lib -p mpp` to apply 1 suggestion)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.59s
+
+info: running `cargo check --offline --no-default-features --features sqlite,tower` on mpp (97/127)
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 2.27s
+
+info: running `cargo check --offline --no-default-features --features stripe,tower` on mpp (98/127)
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: unused imports: `format_receipt`, `format_www_authenticate_many`, and `parse_authorization`
+  --> src/server/middleware.rs:43:29
+   |
+43 |     extract_payment_scheme, format_receipt, format_www_authenticate_many, parse_authorization,
+   |                             ^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: trait `ResultExt` is never used
+   --> src/error.rs:340:18
+    |
+340 | pub(crate) trait ResultExt<T> {
+    |                  ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `mpp` (lib) generated 2 warnings (run `cargo fix --lib -p mpp` to apply 1 suggestion)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.68s
+
+info: running `cargo check --offline --no-default-features --features tempo,tower` on mpp (99/127)
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: trait `ResultExt` is never used
+   --> src/error.rs:340:18
+    |
+340 | pub(crate) trait ResultExt<T> {
+    |                  ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `sign_proof` is never used
+  --> src/protocol/methods/tempo/proof.rs:88:14
+   |
+88 | pub async fn sign_proof(
+   |              ^^^^^^^^^^
+
+warning: function `sign_proof_primitive` is never used
+   --> src/protocol/methods/tempo/proof.rs:110:14
+    |
+110 | pub async fn sign_proof_primitive(
+    |              ^^^^^^^^^^^^^^^^^^^^
+
+warning: `mpp` (lib) generated 3 warnings
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1.49s
+
+info: running `cargo check --offline --no-default-features --features utils` on mpp (100/127)
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: trait `ResultExt` is never used
+   --> src/error.rs:340:18
+    |
+340 | pub(crate) trait ResultExt<T> {
+    |                  ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `mpp` (lib) generated 1 warning
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.45s
+
+info: running `cargo check --offline --no-default-features --features axum,utils` on mpp (101/127)
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: trait `ResultExt` is never used
+   --> src/error.rs:340:18
+    |
+340 | pub(crate) trait ResultExt<T> {
+    |                  ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: constant `SECRET_KEY_ENV_VAR` is never used
+  --> src/server/mpp.rs:35:7
+   |
+35 | const SECRET_KEY_ENV_VAR: &str = "MPP_SECRET_KEY";
+   |       ^^^^^^^^^^^^^^^^^^
+
+warning: constant `REALM_ENV_VARS` is never used
+  --> src/server/mpp.rs:43:7
+   |
+43 | const REALM_ENV_VARS: &[&str] = &[
+   |       ^^^^^^^^^^^^^^
+
+warning: constant `DEFAULT_REALM` is never used
+  --> src/server/mpp.rs:53:7
+   |
+53 | const DEFAULT_REALM: &str = "MPP Payment";
+   |       ^^^^^^^^^^^^^
+
+warning: function `detect_realm` is never used
+  --> src/server/mpp.rs:64:15
+   |
+64 | pub(crate) fn detect_realm() -> String {
+   |               ^^^^^^^^^^^^
+
+warning: function `realm_from_env` is never used
+  --> src/server/mpp.rs:68:4
+   |
+68 | fn realm_from_env(lookup: impl Fn(&str) -> Option<String>) -> String {
+   |    ^^^^^^^^^^^^^^
+
+warning: `mpp` (lib) generated 6 warnings
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.57s
+
+info: running `cargo check --offline --no-default-features --features client,utils` on mpp (102/127)
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: trait `ResultExt` is never used
+   --> src/error.rs:340:18
+    |
+340 | pub(crate) trait ResultExt<T> {
+    |                  ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `mpp` (lib) generated 1 warning
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.69s
+
+info: running `cargo check --offline --no-default-features --features default,utils` on mpp (103/127)
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: trait `ResultExt` is never used
+   --> src/error.rs:340:18
+    |
+340 | pub(crate) trait ResultExt<T> {
+    |                  ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `mpp` (lib) generated 1 warning
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.48s
+
+info: running `cargo check --offline --no-default-features --features evm,utils` on mpp (104/127)
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: trait `ResultExt` is never used
+   --> src/error.rs:340:18
+    |
+340 | pub(crate) trait ResultExt<T> {
+    |                  ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `mpp` (lib) generated 1 warning
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.59s
+
+info: running `cargo check --offline --no-default-features --features middleware,utils` on mpp (105/127)
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: trait `ResultExt` is never used
+   --> src/error.rs:340:18
+    |
+340 | pub(crate) trait ResultExt<T> {
+    |                  ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `mpp` (lib) generated 1 warning
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.72s
+
+info: running `cargo check --offline --no-default-features --features reqwest-default-tls,utils` on mpp (106/127)
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: trait `ResultExt` is never used
+   --> src/error.rs:340:18
+    |
+340 | pub(crate) trait ResultExt<T> {
+    |                  ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `mpp` (lib) generated 1 warning
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.44s
+
+info: running `cargo check --offline --no-default-features --features reqwest-native-tls,utils` on mpp (107/127)
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: trait `ResultExt` is never used
+   --> src/error.rs:340:18
+    |
+340 | pub(crate) trait ResultExt<T> {
+    |                  ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `mpp` (lib) generated 1 warning
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.43s
+
+info: running `cargo check --offline --no-default-features --features reqwest-rustls-tls,utils` on mpp (108/127)
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: trait `ResultExt` is never used
+   --> src/error.rs:340:18
+    |
+340 | pub(crate) trait ResultExt<T> {
+    |                  ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `mpp` (lib) generated 1 warning
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.44s
+
+info: running `cargo check --offline --no-default-features --features reqwest-rustls-tls-no-provider,utils` on mpp (109/127)
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: trait `ResultExt` is never used
+   --> src/error.rs:340:18
+    |
+340 | pub(crate) trait ResultExt<T> {
+    |                  ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `mpp` (lib) generated 1 warning
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.44s
+
+info: running `cargo check --offline --no-default-features --features server,utils` on mpp (110/127)
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: trait `ResultExt` is never used
+   --> src/error.rs:340:18
+    |
+340 | pub(crate) trait ResultExt<T> {
+    |                  ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: constant `SECRET_KEY_ENV_VAR` is never used
+  --> src/server/mpp.rs:35:7
+   |
+35 | const SECRET_KEY_ENV_VAR: &str = "MPP_SECRET_KEY";
+   |       ^^^^^^^^^^^^^^^^^^
+
+warning: constant `REALM_ENV_VARS` is never used
+  --> src/server/mpp.rs:43:7
+   |
+43 | const REALM_ENV_VARS: &[&str] = &[
+   |       ^^^^^^^^^^^^^^
+
+warning: constant `DEFAULT_REALM` is never used
+  --> src/server/mpp.rs:53:7
+   |
+53 | const DEFAULT_REALM: &str = "MPP Payment";
+   |       ^^^^^^^^^^^^^
+
+warning: function `detect_realm` is never used
+  --> src/server/mpp.rs:64:15
+   |
+64 | pub(crate) fn detect_realm() -> String {
+   |               ^^^^^^^^^^^^
+
+warning: function `realm_from_env` is never used
+  --> src/server/mpp.rs:68:4
+   |
+68 | fn realm_from_env(lookup: impl Fn(&str) -> Option<String>) -> String {
+   |    ^^^^^^^^^^^^^^
+
+warning: `mpp` (lib) generated 6 warnings
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.57s
+
+info: running `cargo check --offline --no-default-features --features sqlite,utils` on mpp (111/127)
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: unused import: `binding::validate_secret_key`
+  --> src/protocol/core/mod.rs:82:16
+   |
+82 | pub(crate) use binding::validate_secret_key;
+   |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: constant `MIN_SECRET_KEY_BYTES` is never used
+  --> src/protocol/core/binding.rs:10:7
+   |
+10 | const MIN_SECRET_KEY_BYTES: usize = 32;
+   |       ^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `validate_secret_key` is never used
+  --> src/protocol/core/binding.rs:17:15
+   |
+17 | pub(crate) fn validate_secret_key(secret_key: &str) -> crate::error::Result<()> {
+   |               ^^^^^^^^^^^^^^^^^^^
+
+warning: type alias `DynSigner` is never used
+   --> src/protocol/methods/tempo/mod.rs:102:17
+    |
+102 | pub(crate) type DynSigner = dyn alloy::signers::Signer + Send + Sync;
+    |                 ^^^^^^^^^
+
+warning: struct `ProofSource` is never constructed
+  --> src/protocol/methods/tempo/proof.rs:31:12
+   |
+31 | pub struct ProofSource {
+   |            ^^^^^^^^^^^
+
+warning: function `parse_proof_source` is never used
+  --> src/protocol/methods/tempo/proof.rs:41:8
+   |
+41 | pub fn parse_proof_source(source: &str) -> crate::error::Result<ProofSource> {
+   |        ^^^^^^^^^^^^^^^^^^
+
+warning: function `verify_proof` is never used
+   --> src/protocol/methods/tempo/proof.rs:127:8
+    |
+127 | pub fn verify_proof(
+    |        ^^^^^^^^^^^^
+
+warning: function `recover_proof_signer` is never used
+   --> src/protocol/methods/tempo/proof.rs:154:8
+    |
+154 | pub fn recover_proof_signer(
+    |        ^^^^^^^^^^^^^^^^^^^^
+
+warning: function `parse_signature` is never used
+   --> src/protocol/methods/tempo/proof.rs:174:4
+    |
+174 | fn parse_signature(signature_hex: &str) -> crate::error::Result<TempoSignature> {
+    |    ^^^^^^^^^^^^^^^
+
+warning: `mpp` (lib) generated 9 warnings (run `cargo fix --lib -p mpp` to apply 1 suggestion)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1.76s
+
+info: running `cargo check --offline --no-default-features --features stripe,utils` on mpp (112/127)
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: trait `ResultExt` is never used
+   --> src/error.rs:340:18
+    |
+340 | pub(crate) trait ResultExt<T> {
+    |                  ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `mpp` (lib) generated 1 warning
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.50s
+
+info: running `cargo check --offline --no-default-features --features tempo,utils` on mpp (113/127)
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: unused import: `binding::validate_secret_key`
+  --> src/protocol/core/mod.rs:82:16
+   |
+82 | pub(crate) use binding::validate_secret_key;
+   |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: trait `ResultExt` is never used
+   --> src/error.rs:340:18
+    |
+340 | pub(crate) trait ResultExt<T> {
+    |                  ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: constant `MIN_SECRET_KEY_BYTES` is never used
+  --> src/protocol/core/binding.rs:10:7
+   |
+10 | const MIN_SECRET_KEY_BYTES: usize = 32;
+   |       ^^^^^^^^^^^^^^^^^^^^
+
+warning: function `validate_secret_key` is never used
+  --> src/protocol/core/binding.rs:17:15
+   |
+17 | pub(crate) fn validate_secret_key(secret_key: &str) -> crate::error::Result<()> {
+   |               ^^^^^^^^^^^^^^^^^^^
+
+warning: type alias `DynSigner` is never used
+   --> src/protocol/methods/tempo/mod.rs:102:17
+    |
+102 | pub(crate) type DynSigner = dyn alloy::signers::Signer + Send + Sync;
+    |                 ^^^^^^^^^
+
+warning: constant `DOMAIN_NAME` is never used
+  --> src/protocol/methods/tempo/proof.rs:11:11
+   |
+11 | pub const DOMAIN_NAME: &str = "MPP";
+   |           ^^^^^^^^^^^
+
+warning: constant `DOMAIN_VERSION` is never used
+  --> src/protocol/methods/tempo/proof.rs:14:11
+   |
+14 | pub const DOMAIN_VERSION: &str = "3";
+   |           ^^^^^^^^^^^^^^
+
+warning: function `proof_source` is never used
+  --> src/protocol/methods/tempo/proof.rs:26:8
+   |
+26 | pub fn proof_source(address: Address, chain_id: u64) -> String {
+   |        ^^^^^^^^^^^^
+
+warning: struct `ProofSource` is never constructed
+  --> src/protocol/methods/tempo/proof.rs:31:12
+   |
+31 | pub struct ProofSource {
+   |            ^^^^^^^^^^^
+
+warning: function `parse_proof_source` is never used
+  --> src/protocol/methods/tempo/proof.rs:41:8
+   |
+41 | pub fn parse_proof_source(source: &str) -> crate::error::Result<ProofSource> {
+   |        ^^^^^^^^^^^^^^^^^^
+
+warning: function `signing_hash` is never used
+  --> src/protocol/methods/tempo/proof.rs:71:8
+   |
+71 | pub fn signing_hash(account: Address, chain_id: u64, challenge_id: &str, realm: &str) -> B256 {
+   |        ^^^^^^^^^^^^
+
+warning: function `sign_proof` is never used
+  --> src/protocol/methods/tempo/proof.rs:88:14
+   |
+88 | pub async fn sign_proof(
+   |              ^^^^^^^^^^
+
+warning: function `sign_proof_primitive` is never used
+   --> src/protocol/methods/tempo/proof.rs:110:14
+    |
+110 | pub async fn sign_proof_primitive(
+    |              ^^^^^^^^^^^^^^^^^^^^
+
+warning: function `verify_proof` is never used
+   --> src/protocol/methods/tempo/proof.rs:127:8
+    |
+127 | pub fn verify_proof(
+    |        ^^^^^^^^^^^^
+
+warning: function `recover_proof_signer` is never used
+   --> src/protocol/methods/tempo/proof.rs:154:8
+    |
+154 | pub fn recover_proof_signer(
+    |        ^^^^^^^^^^^^^^^^^^^^
+
+warning: function `parse_signature` is never used
+   --> src/protocol/methods/tempo/proof.rs:174:4
+    |
+174 | fn parse_signature(signature_hex: &str) -> crate::error::Result<TempoSignature> {
+    |    ^^^^^^^^^^^^^^^
+
+warning: `mpp` (lib) generated 16 warnings (run `cargo fix --lib -p mpp` to apply 1 suggestion)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.95s
+
+info: running `cargo check --offline --no-default-features --features tower,utils` on mpp (114/127)
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: unused imports: `format_receipt`, `format_www_authenticate_many`, and `parse_authorization`
+  --> src/server/middleware.rs:43:29
+   |
+43 |     extract_payment_scheme, format_receipt, format_www_authenticate_many, parse_authorization,
+   |                             ^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: trait `ResultExt` is never used
+   --> src/error.rs:340:18
+    |
+340 | pub(crate) trait ResultExt<T> {
+    |                  ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: constant `SECRET_KEY_ENV_VAR` is never used
+  --> src/server/mpp.rs:35:7
+   |
+35 | const SECRET_KEY_ENV_VAR: &str = "MPP_SECRET_KEY";
+   |       ^^^^^^^^^^^^^^^^^^
+
+warning: constant `REALM_ENV_VARS` is never used
+  --> src/server/mpp.rs:43:7
+   |
+43 | const REALM_ENV_VARS: &[&str] = &[
+   |       ^^^^^^^^^^^^^^
+
+warning: constant `DEFAULT_REALM` is never used
+  --> src/server/mpp.rs:53:7
+   |
+53 | const DEFAULT_REALM: &str = "MPP Payment";
+   |       ^^^^^^^^^^^^^
+
+warning: function `detect_realm` is never used
+  --> src/server/mpp.rs:64:15
+   |
+64 | pub(crate) fn detect_realm() -> String {
+   |               ^^^^^^^^^^^^
+
+warning: function `realm_from_env` is never used
+  --> src/server/mpp.rs:68:4
+   |
+68 | fn realm_from_env(lookup: impl Fn(&str) -> Option<String>) -> String {
+   |    ^^^^^^^^^^^^^^
+
+warning: `mpp` (lib) generated 7 warnings (run `cargo fix --lib -p mpp` to apply 1 suggestion)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.62s
+
+info: running `cargo check --offline --no-default-features --features ws` on mpp (115/127)
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: trait `ResultExt` is never used
+   --> src/error.rs:340:18
+    |
+340 | pub(crate) trait ResultExt<T> {
+    |                  ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: constant `SECRET_KEY_ENV_VAR` is never used
+  --> src/server/mpp.rs:35:7
+   |
+35 | const SECRET_KEY_ENV_VAR: &str = "MPP_SECRET_KEY";
+   |       ^^^^^^^^^^^^^^^^^^
+
+warning: constant `REALM_ENV_VARS` is never used
+  --> src/server/mpp.rs:43:7
+   |
+43 | const REALM_ENV_VARS: &[&str] = &[
+   |       ^^^^^^^^^^^^^^
+
+warning: constant `DEFAULT_REALM` is never used
+  --> src/server/mpp.rs:53:7
+   |
+53 | const DEFAULT_REALM: &str = "MPP Payment";
+   |       ^^^^^^^^^^^^^
+
+warning: function `detect_realm` is never used
+  --> src/server/mpp.rs:64:15
+   |
+64 | pub(crate) fn detect_realm() -> String {
+   |               ^^^^^^^^^^^^
+
+warning: function `realm_from_env` is never used
+  --> src/server/mpp.rs:68:4
+   |
+68 | fn realm_from_env(lookup: impl Fn(&str) -> Option<String>) -> String {
+   |    ^^^^^^^^^^^^^^
+
+warning: `mpp` (lib) generated 6 warnings
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.89s
+
+info: running `cargo check --offline --no-default-features --features axum,ws` on mpp (116/127)
+    Checking axum v0.8.9
+    Checking reqwest v0.13.5
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: trait `ResultExt` is never used
+   --> src/error.rs:340:18
+    |
+340 | pub(crate) trait ResultExt<T> {
+    |                  ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: constant `SECRET_KEY_ENV_VAR` is never used
+  --> src/server/mpp.rs:35:7
+   |
+35 | const SECRET_KEY_ENV_VAR: &str = "MPP_SECRET_KEY";
+   |       ^^^^^^^^^^^^^^^^^^
+
+warning: constant `REALM_ENV_VARS` is never used
+  --> src/server/mpp.rs:43:7
+   |
+43 | const REALM_ENV_VARS: &[&str] = &[
+   |       ^^^^^^^^^^^^^^
+
+warning: constant `DEFAULT_REALM` is never used
+  --> src/server/mpp.rs:53:7
+   |
+53 | const DEFAULT_REALM: &str = "MPP Payment";
+   |       ^^^^^^^^^^^^^
+
+warning: function `detect_realm` is never used
+  --> src/server/mpp.rs:64:15
+   |
+64 | pub(crate) fn detect_realm() -> String {
+   |               ^^^^^^^^^^^^
+
+warning: function `realm_from_env` is never used
+  --> src/server/mpp.rs:68:4
+   |
+68 | fn realm_from_env(lookup: impl Fn(&str) -> Option<String>) -> String {
+   |    ^^^^^^^^^^^^^^
+
+warning: `mpp` (lib) generated 6 warnings
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 2.00s
+
+info: running `cargo check --offline --no-default-features --features default,ws` on mpp (117/127)
+    Checking tokio v1.53.3
+    Checking hyper v1.12.0
+    Checking tokio-rustls v0.26.6
+    Checking tower v0.5.3
+    Checking tower-http v0.6.11
+    Checking hyper-util v0.1.21
+    Checking hyper-rustls v0.27.10
+    Checking reqwest v0.13.5
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: trait `ResultExt` is never used
+   --> src/error.rs:340:18
+    |
+340 | pub(crate) trait ResultExt<T> {
+    |                  ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: constant `SECRET_KEY_ENV_VAR` is never used
+  --> src/server/mpp.rs:35:7
+   |
+35 | const SECRET_KEY_ENV_VAR: &str = "MPP_SECRET_KEY";
+   |       ^^^^^^^^^^^^^^^^^^
+
+warning: constant `REALM_ENV_VARS` is never used
+  --> src/server/mpp.rs:43:7
+   |
+43 | const REALM_ENV_VARS: &[&str] = &[
+   |       ^^^^^^^^^^^^^^
+
+warning: constant `DEFAULT_REALM` is never used
+  --> src/server/mpp.rs:53:7
+   |
+53 | const DEFAULT_REALM: &str = "MPP Payment";
+   |       ^^^^^^^^^^^^^
+
+warning: function `detect_realm` is never used
+  --> src/server/mpp.rs:64:15
+   |
+64 | pub(crate) fn detect_realm() -> String {
+   |               ^^^^^^^^^^^^
+
+warning: function `realm_from_env` is never used
+  --> src/server/mpp.rs:68:4
+   |
+68 | fn realm_from_env(lookup: impl Fn(&str) -> Option<String>) -> String {
+   |    ^^^^^^^^^^^^^^
+
+warning: `mpp` (lib) generated 6 warnings
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 2.93s
+
+info: running `cargo check --offline --no-default-features --features evm,ws` on mpp (118/127)
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: trait `ResultExt` is never used
+   --> src/error.rs:340:18
+    |
+340 | pub(crate) trait ResultExt<T> {
+    |                  ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: constant `SECRET_KEY_ENV_VAR` is never used
+  --> src/server/mpp.rs:35:7
+   |
+35 | const SECRET_KEY_ENV_VAR: &str = "MPP_SECRET_KEY";
+   |       ^^^^^^^^^^^^^^^^^^
+
+warning: constant `REALM_ENV_VARS` is never used
+  --> src/server/mpp.rs:43:7
+   |
+43 | const REALM_ENV_VARS: &[&str] = &[
+   |       ^^^^^^^^^^^^^^
+
+warning: constant `DEFAULT_REALM` is never used
+  --> src/server/mpp.rs:53:7
+   |
+53 | const DEFAULT_REALM: &str = "MPP Payment";
+   |       ^^^^^^^^^^^^^
+
+warning: function `detect_realm` is never used
+  --> src/server/mpp.rs:64:15
+   |
+64 | pub(crate) fn detect_realm() -> String {
+   |               ^^^^^^^^^^^^
+
+warning: function `realm_from_env` is never used
+  --> src/server/mpp.rs:68:4
+   |
+68 | fn realm_from_env(lookup: impl Fn(&str) -> Option<String>) -> String {
+   |    ^^^^^^^^^^^^^^
+
+warning: `mpp` (lib) generated 6 warnings
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1.03s
+
+info: running `cargo check --offline --no-default-features --features middleware,ws` on mpp (119/127)
+   Compiling futures-macro v0.3.34
+    Checking futures-util v0.3.34
+    Checking tower v0.5.3
+    Checking hyper-util v0.1.21
+    Checking tower-http v0.6.11
+    Checking reqwest v0.13.5
+    Checking reqwest-middleware v0.5.2
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: trait `ResultExt` is never used
+   --> src/error.rs:340:18
+    |
+340 | pub(crate) trait ResultExt<T> {
+    |                  ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: constant `SECRET_KEY_ENV_VAR` is never used
+  --> src/server/mpp.rs:35:7
+   |
+35 | const SECRET_KEY_ENV_VAR: &str = "MPP_SECRET_KEY";
+   |       ^^^^^^^^^^^^^^^^^^
+
+warning: constant `REALM_ENV_VARS` is never used
+  --> src/server/mpp.rs:43:7
+   |
+43 | const REALM_ENV_VARS: &[&str] = &[
+   |       ^^^^^^^^^^^^^^
+
+warning: constant `DEFAULT_REALM` is never used
+  --> src/server/mpp.rs:53:7
+   |
+53 | const DEFAULT_REALM: &str = "MPP Payment";
+   |       ^^^^^^^^^^^^^
+
+warning: function `detect_realm` is never used
+  --> src/server/mpp.rs:64:15
+   |
+64 | pub(crate) fn detect_realm() -> String {
+   |               ^^^^^^^^^^^^
+
+warning: function `realm_from_env` is never used
+  --> src/server/mpp.rs:68:4
+   |
+68 | fn realm_from_env(lookup: impl Fn(&str) -> Option<String>) -> String {
+   |    ^^^^^^^^^^^^^^
+
+warning: `mpp` (lib) generated 6 warnings
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 3.27s
+
+info: running `cargo check --offline --no-default-features --features reqwest-default-tls,ws` on mpp (120/127)
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: trait `ResultExt` is never used
+   --> src/error.rs:340:18
+    |
+340 | pub(crate) trait ResultExt<T> {
+    |                  ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: constant `SECRET_KEY_ENV_VAR` is never used
+  --> src/server/mpp.rs:35:7
+   |
+35 | const SECRET_KEY_ENV_VAR: &str = "MPP_SECRET_KEY";
+   |       ^^^^^^^^^^^^^^^^^^
+
+warning: constant `REALM_ENV_VARS` is never used
+  --> src/server/mpp.rs:43:7
+   |
+43 | const REALM_ENV_VARS: &[&str] = &[
+   |       ^^^^^^^^^^^^^^
+
+warning: constant `DEFAULT_REALM` is never used
+  --> src/server/mpp.rs:53:7
+   |
+53 | const DEFAULT_REALM: &str = "MPP Payment";
+   |       ^^^^^^^^^^^^^
+
+warning: function `detect_realm` is never used
+  --> src/server/mpp.rs:64:15
+   |
+64 | pub(crate) fn detect_realm() -> String {
+   |               ^^^^^^^^^^^^
+
+warning: function `realm_from_env` is never used
+  --> src/server/mpp.rs:68:4
+   |
+68 | fn realm_from_env(lookup: impl Fn(&str) -> Option<String>) -> String {
+   |    ^^^^^^^^^^^^^^
+
+warning: `mpp` (lib) generated 6 warnings
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.95s
+
+info: running `cargo check --offline --no-default-features --features reqwest-native-tls,ws` on mpp (121/127)
+    Checking tokio-native-tls v0.3.1
+    Checking tower-http v0.6.11
+    Checking hyper-tls v0.6.0
+    Checking reqwest v0.13.5
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: trait `ResultExt` is never used
+   --> src/error.rs:340:18
+    |
+340 | pub(crate) trait ResultExt<T> {
+    |                  ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: constant `SECRET_KEY_ENV_VAR` is never used
+  --> src/server/mpp.rs:35:7
+   |
+35 | const SECRET_KEY_ENV_VAR: &str = "MPP_SECRET_KEY";
+   |       ^^^^^^^^^^^^^^^^^^
+
+warning: constant `REALM_ENV_VARS` is never used
+  --> src/server/mpp.rs:43:7
+   |
+43 | const REALM_ENV_VARS: &[&str] = &[
+   |       ^^^^^^^^^^^^^^
+
+warning: constant `DEFAULT_REALM` is never used
+  --> src/server/mpp.rs:53:7
+   |
+53 | const DEFAULT_REALM: &str = "MPP Payment";
+   |       ^^^^^^^^^^^^^
+
+warning: function `detect_realm` is never used
+  --> src/server/mpp.rs:64:15
+   |
+64 | pub(crate) fn detect_realm() -> String {
+   |               ^^^^^^^^^^^^
+
+warning: function `realm_from_env` is never used
+  --> src/server/mpp.rs:68:4
+   |
+68 | fn realm_from_env(lookup: impl Fn(&str) -> Option<String>) -> String {
+   |    ^^^^^^^^^^^^^^
+
+warning: `mpp` (lib) generated 6 warnings
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1.28s
+
+info: running `cargo check --offline --no-default-features --features reqwest-rustls-tls,ws` on mpp (122/127)
+    Checking reqwest v0.13.5
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: trait `ResultExt` is never used
+   --> src/error.rs:340:18
+    |
+340 | pub(crate) trait ResultExt<T> {
+    |                  ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: constant `SECRET_KEY_ENV_VAR` is never used
+  --> src/server/mpp.rs:35:7
+   |
+35 | const SECRET_KEY_ENV_VAR: &str = "MPP_SECRET_KEY";
+   |       ^^^^^^^^^^^^^^^^^^
+
+warning: constant `REALM_ENV_VARS` is never used
+  --> src/server/mpp.rs:43:7
+   |
+43 | const REALM_ENV_VARS: &[&str] = &[
+   |       ^^^^^^^^^^^^^^
+
+warning: constant `DEFAULT_REALM` is never used
+  --> src/server/mpp.rs:53:7
+   |
+53 | const DEFAULT_REALM: &str = "MPP Payment";
+   |       ^^^^^^^^^^^^^
+
+warning: function `detect_realm` is never used
+  --> src/server/mpp.rs:64:15
+   |
+64 | pub(crate) fn detect_realm() -> String {
+   |               ^^^^^^^^^^^^
+
+warning: function `realm_from_env` is never used
+  --> src/server/mpp.rs:68:4
+   |
+68 | fn realm_from_env(lookup: impl Fn(&str) -> Option<String>) -> String {
+   |    ^^^^^^^^^^^^^^
+
+warning: `mpp` (lib) generated 6 warnings
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1.19s
+
+info: running `cargo check --offline --no-default-features --features reqwest-rustls-tls-no-provider,ws` on mpp (123/127)
+    Checking tokio-rustls v0.26.6
+    Checking hyper-rustls v0.27.10
+    Checking reqwest v0.13.5
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: trait `ResultExt` is never used
+   --> src/error.rs:340:18
+    |
+340 | pub(crate) trait ResultExt<T> {
+    |                  ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: constant `SECRET_KEY_ENV_VAR` is never used
+  --> src/server/mpp.rs:35:7
+   |
+35 | const SECRET_KEY_ENV_VAR: &str = "MPP_SECRET_KEY";
+   |       ^^^^^^^^^^^^^^^^^^
+
+warning: constant `REALM_ENV_VARS` is never used
+  --> src/server/mpp.rs:43:7
+   |
+43 | const REALM_ENV_VARS: &[&str] = &[
+   |       ^^^^^^^^^^^^^^
+
+warning: constant `DEFAULT_REALM` is never used
+  --> src/server/mpp.rs:53:7
+   |
+53 | const DEFAULT_REALM: &str = "MPP Payment";
+   |       ^^^^^^^^^^^^^
+
+warning: function `detect_realm` is never used
+  --> src/server/mpp.rs:64:15
+   |
+64 | pub(crate) fn detect_realm() -> String {
+   |               ^^^^^^^^^^^^
+
+warning: function `realm_from_env` is never used
+  --> src/server/mpp.rs:68:4
+   |
+68 | fn realm_from_env(lookup: impl Fn(&str) -> Option<String>) -> String {
+   |    ^^^^^^^^^^^^^^
+
+warning: `mpp` (lib) generated 6 warnings
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1.35s
+
+info: running `cargo check --offline --no-default-features --features sqlite,ws` on mpp (124/127)
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 2.59s
+
+info: running `cargo check --offline --no-default-features --features stripe,ws` on mpp (125/127)
+    Checking tower-http v0.6.11
+    Checking reqwest v0.13.5
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: method `mpp_http` is never used
+   --> src/error.rs:342:8
+    |
+340 | pub(crate) trait ResultExt<T> {
+    |                  --------- method in this trait
+341 |     /// Map the error into [`MppError::Http`] with the given context prefix.
+342 |     fn mpp_http(self, context: &str) -> std::result::Result<T, MppError>;
+    |        ^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `mpp` (lib) generated 1 warning
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1.36s
+
+info: running `cargo check --offline --no-default-features --features tempo,ws` on mpp (126/127)
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 2.53s
+
+info: running `cargo check --offline --no-default-features --features tower,ws` on mpp (127/127)
+    Checking mpp v0.15.1 (/private/var/folders/20/37g9knxj34q9zn25066w0r380000gn/T/mpp-rs-review-matrix-r1gjnuwv)
+warning: unused imports: `format_receipt`, `format_www_authenticate_many`, and `parse_authorization`
+  --> src/server/middleware.rs:43:29
+   |
+43 |     extract_payment_scheme, format_receipt, format_www_authenticate_many, parse_authorization,
+   |                             ^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: trait `ResultExt` is never used
+   --> src/error.rs:340:18
+    |
+340 | pub(crate) trait ResultExt<T> {
+    |                  ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: constant `SECRET_KEY_ENV_VAR` is never used
+  --> src/server/mpp.rs:35:7
+   |
+35 | const SECRET_KEY_ENV_VAR: &str = "MPP_SECRET_KEY";
+   |       ^^^^^^^^^^^^^^^^^^
+
+warning: constant `REALM_ENV_VARS` is never used
+  --> src/server/mpp.rs:43:7
+   |
+43 | const REALM_ENV_VARS: &[&str] = &[
+   |       ^^^^^^^^^^^^^^
+
+warning: constant `DEFAULT_REALM` is never used
+  --> src/server/mpp.rs:53:7
+   |
+53 | const DEFAULT_REALM: &str = "MPP Payment";
+   |       ^^^^^^^^^^^^^
+
+warning: function `detect_realm` is never used
+  --> src/server/mpp.rs:64:15
+   |
+64 | pub(crate) fn detect_realm() -> String {
+   |               ^^^^^^^^^^^^
+
+warning: function `realm_from_env` is never used
+  --> src/server/mpp.rs:68:4
+   |
+68 | fn realm_from_env(lookup: impl Fn(&str) -> Option<String>) -> String {
+   |    ^^^^^^^^^^^^^^
+
+warning: `mpp` (lib) generated 7 warnings (run `cargo fix --lib -p mpp` to apply 1 suggestion)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.92s

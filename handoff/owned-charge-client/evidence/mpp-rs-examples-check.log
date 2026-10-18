@@ -1,0 +1,31 @@
+    Blocking waiting for file lock on build directory
+    Checking rustls-platform-verifier v0.7.1
+    Checking tower-http v0.6.11
+    Checking commonware-utils v2026.9.0
+    Checking tungstenite v0.29.0
+    Checking reqwest v0.13.5
+    Checking tokio-tungstenite v0.29.0
+    Checking commonware-math v2026.9.0
+    Checking axum v0.8.9
+    Checking alloy-transport-ws v2.5.0
+    Checking commonware-cryptography v2026.9.0
+    Checking alloy-transport-http v2.5.0
+    Checking alloy-rpc-client v2.5.0
+    Checking alloy-provider v2.5.0
+    Checking alloy-contract v2.5.0
+    Checking tempo-contracts v1.11.0
+    Checking alloy v2.5.0
+    Checking tempo-primitives v1.11.0
+    Checking tempo-chainspec v1.11.0
+    Checking tempo-alloy v1.11.0
+    Checking mpp v0.15.1 (/Users/akshat/mpp-rs)
+    Checking session-sse-example v0.3.0 (/Users/akshat/mpp-rs/examples/session/sse)
+    Checking session-multi-fetch-example v0.3.0 (/Users/akshat/mpp-rs/examples/session/multi-fetch)
+    Checking charge-relay-example v0.1.0 (/Users/akshat/mpp-rs/examples/charge-relay)
+    Checking axum-extractor-example v0.3.0 (/Users/akshat/mpp-rs/examples/axum-extractor)
+    Checking stripe-example v0.3.0 (/Users/akshat/mpp-rs/examples/stripe)
+    Checking basic-example v0.3.0 (/Users/akshat/mpp-rs/examples/basic)
+    Checking alloy-transport-mpp v0.2.0 (/Users/akshat/mpp-rs/crates/alloy-transport-mpp)
+    Checking ws-example v0.2.0 (/Users/akshat/mpp-rs/examples/ws)
+    Checking catalog-client-example v0.1.0 (/Users/akshat/mpp-rs/examples/catalog-client)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 23.96s
