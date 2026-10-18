@@ -33,6 +33,8 @@ pub mod ws;
 pub mod tempo;
 
 #[cfg(feature = "client")]
+mod charge_client;
+#[cfg(feature = "client")]
 mod fetch;
 #[cfg(feature = "client")]
 mod flow;
@@ -58,6 +60,9 @@ pub use events::{
 
 #[cfg(feature = "client")]
 pub use fetch::PaymentExt as Fetch;
+
+#[cfg(feature = "client")]
+pub use charge_client::ChargeClient;
 
 #[cfg(feature = "middleware")]
 pub use middleware::PaymentMiddleware;

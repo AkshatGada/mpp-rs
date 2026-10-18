@@ -29,6 +29,16 @@ pub(crate) trait Exchange: Send {
     /// Error of a request that could not be sent.
     type Error: Display + Send;
 
+    /// Restricts offers before provider preparation and after preparation.
+    /// Caller-owned transports cannot safely send custom credential headers.
+    fn check_challenge(&self, challenge: &PaymentChallenge) -> Result<(), HttpError> {
+        if challenge.credential_header() == "Authorization" {
+            Ok(())
+        } else {
+            Err(HttpError::UnsafeCredentialHeader)
+        }
+    }
+
     /// Caller-configured client available for session management requests.
     fn http_client(&self) -> Option<reqwest::Client> {
         None
@@ -156,24 +166,19 @@ impl<P: PaymentProvider> PaymentFlow<'_, P> {
                 .collect();
 
             let safe_supported = challenges.iter().any(|challenge| {
-                challenge.credential_header() == "Authorization"
+                exchange.check_challenge(challenge).is_ok()
                     && self
                         .provider
                         .supports(challenge.method.as_str(), challenge.intent.as_str())
             });
             if !safe_supported {
-                if let Some(unsafe_challenge) = challenges.iter().find(|challenge| {
-                    challenge.credential_header() != "Authorization"
-                        && self
-                            .provider
-                            .supports(challenge.method.as_str(), challenge.intent.as_str())
+                for challenge in challenges.iter().filter(|challenge| {
+                    self.provider
+                        .supports(challenge.method.as_str(), challenge.intent.as_str())
                 }) {
-                    return Err(self
-                        .fail(
-                            Some(unsafe_challenge.clone()),
-                            HttpError::UnsafeCredentialHeader,
-                        )
-                        .await);
+                    if let Err(error) = exchange.check_challenge(challenge) {
+                        return Err(self.fail(Some(challenge.clone()), error).await);
+                    }
                 }
             }
 
@@ -181,7 +186,7 @@ impl<P: PaymentProvider> PaymentFlow<'_, P> {
                 &challenges,
                 ranking_accept.as_deref(),
                 |challenge| {
-                    challenge.credential_header() == "Authorization"
+                    exchange.check_challenge(challenge).is_ok()
                         && self
                             .provider
                             .supports(challenge.method.as_str(), challenge.intent.as_str())
@@ -213,6 +218,13 @@ impl<P: PaymentProvider> PaymentFlow<'_, P> {
                 }
             };
 
+            // A provider's selector must not bypass transport restrictions.
+            if let Err(error) =
+                self.check_challenge(exchange, &challenge, ranking_accept.as_deref())
+            {
+                return Err(self.fail(Some(challenge), error).await);
+            }
+
             let challenge = match self
                 .provider
                 .prepare_http_payment_challenge(&challenge, payment_context.clone())
@@ -239,13 +251,12 @@ impl<P: PaymentProvider> PaymentFlow<'_, P> {
                     return Err(self.fail(Some(challenge), HttpError::Payment(err)).await);
                 }
             };
-            // The caller owns reqwest's redirect policy, which cannot be changed
-            // for one request. Unlike Authorization, reqwest preserves this
-            // custom header across origins. Reject before the provider pays.
-            if challenge.credential_header() != "Authorization" {
-                return Err(self
-                    .fail(Some(challenge), HttpError::UnsafeCredentialHeader)
-                    .await);
+            // Preparation may replace the challenge. Recheck before creating
+            // a credential, including the charge-only owned transport's limit.
+            if let Err(error) =
+                self.check_challenge(exchange, &challenge, ranking_accept.as_deref())
+            {
+                return Err(self.fail(Some(challenge), error).await);
             }
             payment_attempt += 1;
 
@@ -379,6 +390,35 @@ impl<P: PaymentProvider> PaymentFlow<'_, P> {
         }
 
         Ok(resp)
+    }
+
+    /// Neither provider selection nor preparation can expand transport or
+    /// request permissions, or replace an offer with an unsupported/expired one.
+    fn check_challenge<X: Exchange>(
+        &self,
+        exchange: &X,
+        challenge: &PaymentChallenge,
+        ranking_accept: Option<&str>,
+    ) -> Result<(), HttpError> {
+        exchange.check_challenge(challenge)?;
+        select_supported_challenge(
+            std::slice::from_ref(challenge),
+            ranking_accept,
+            |challenge| {
+                self.provider
+                    .supports(challenge.method.as_str(), challenge.intent.as_str())
+            },
+            |candidates| candidates.first().copied(),
+        )
+        .map(|_| ())
+        .map_err(|error| match error {
+            ChallengeSelectionError::Expired(challenge) => {
+                HttpError::Payment(expired_payment_error(&challenge))
+            }
+            ChallengeSelectionError::NoSupportedChallenge(message) => {
+                HttpError::NoSupportedChallenge(message)
+            }
+        })
     }
 
     /// Emits `payment.failed` for `error` and hands it back.
