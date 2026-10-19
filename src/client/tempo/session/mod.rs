@@ -114,6 +114,8 @@ pub struct TempoSessionProvider {
     top_up_amount: Option<u128>,
     /// Stablecoin used to acquire the session currency before open/top-up.
     autoswap: Option<AutoswapConfig>,
+    /// Token paying gas for unsponsored opens and top-ups.
+    fee_token: Option<Address>,
     /// Channel registry: key is `payee:currency:escrow` (lowercase).
     channels: Arc<Mutex<HashMap<String, ChannelEntry>>>,
     /// Durable channel view. Recovery policy remains owned by this provider.
@@ -174,6 +176,7 @@ impl TempoSessionProvider {
             default_deposit: None,
             top_up_amount: None,
             autoswap: None,
+            fee_token: None,
             channels: Arc::new(Mutex::new(HashMap::new())),
             channel_store: Arc::new(MemoryChannelStore::default()),
             channel_id_to_key: Arc::new(Mutex::new(HashMap::new())),
@@ -256,6 +259,17 @@ impl TempoSessionProvider {
     /// Get the autoswap configuration, if set.
     pub fn autoswap(&self) -> Option<&AutoswapConfig> {
         self.autoswap.as_ref()
+    }
+
+    /// Pay gas for unsponsored channel opens and top-ups in `token`.
+    ///
+    /// Without it, gas is paid in the autoswap input token, or else in the
+    /// session currency. A recipient-restricted currency such as MACH cannot
+    /// pay its own gas, so a MACH session without fee sponsorship needs a
+    /// separate fee token.
+    pub fn with_fee_token(mut self, token: Address) -> Self {
+        self.fee_token = Some(token);
+        self
     }
 
     /// Persist reusable native MPP channels in `store`.
@@ -342,9 +356,9 @@ impl TempoSessionProvider {
     }
 
     fn fee_token(&self, currency: Address) -> Address {
-        self.autoswap
-            .as_ref()
-            .map_or(currency, |config| config.token_in)
+        self.fee_token
+            .or_else(|| self.autoswap.as_ref().map(|config| config.token_in))
+            .unwrap_or(currency)
     }
 
     fn required_top_up(
@@ -1822,6 +1836,44 @@ impl TempoSessionProvider {
         Ok(())
     }
 
+    /// Resolve a pending channel open that the server reports as accepted.
+    ///
+    /// The payment flow resolves an open from the `Payment-Receipt` header of
+    /// its response. Metered SSE responses report acceptance in the body
+    /// instead, through `payment-receipt` and `payment-need-voucher` events
+    /// carrying the server's accepted cumulative amount. An accepted amount
+    /// covering the open's authorized cumulative amount resolves the open, so
+    /// later vouchers may raise it. Returns whether an open was resolved.
+    pub async fn acknowledge_accepted(
+        &self,
+        channel_id_hex: &str,
+        accepted_cumulative: u128,
+    ) -> Result<bool, MppError> {
+        let channel_id = channel_id_hex
+            .parse::<B256>()
+            .map_err(|_| MppError::InvalidConfig("invalid session channel ID".into()))?
+            .to_string();
+        if !self.pending_opens.lock().unwrap().contains_key(&channel_id) {
+            return Ok(false);
+        }
+        let entry = {
+            let key = self
+                .channel_id_to_key
+                .lock()
+                .unwrap()
+                .get(&channel_id)
+                .cloned();
+            key.and_then(|key| self.channels.lock().unwrap().get(&key).cloned())
+        };
+        let Some(entry) = entry.filter(|entry| accepted_cumulative >= entry.cumulative_amount)
+        else {
+            return Ok(false);
+        };
+        self.commit_referenced_open(&channel_id);
+        self.persist_channel(&entry).await?;
+        Ok(true)
+    }
+
     /// Close the payment channel and settle on-chain.
     ///
     /// Sends a close credential to the server, which triggers on-chain settlement.
@@ -2175,11 +2227,23 @@ impl TempoSessionProvider {
 
         if let Some((mut entry, includes_request)) = existing {
             if entry.opened {
-                let pending = self
+                let mut pending = self
                     .pending_opens
                     .lock()
                     .unwrap()
                     .contains_key(&entry.channel_id.to_string());
+                // Settlement of the opening authorization on-chain proves the
+                // server accepted the open, even without a receipt. A channel
+                // restored above has already been checked against chain state.
+                if pending && precompile && !includes_request {
+                    let state =
+                        read_on_chain_channel_state(&self.rpc_provider, entry.channel_id).await?;
+                    if state.settled != 0 && state.settled >= entry.cumulative_amount {
+                        self.commit_referenced_open(&entry.channel_id.to_string());
+                        self.persist_channel(&entry).await?;
+                        pending = false;
+                    }
+                }
                 // Retry the authorized opening amount until a receipt reconciles it.
                 if !includes_request && !pending {
                     entry.cumulative_amount =
@@ -2650,6 +2714,13 @@ mod tests {
         assert_eq!(provider.default_deposit, Some(500_000));
         assert_eq!(provider.autoswap().unwrap().token_in, swap_token);
         assert_eq!(provider.fee_token(Address::repeat_byte(0x44)), swap_token);
+        let fee_token = Address::repeat_byte(0x55);
+        assert_eq!(
+            provider
+                .with_fee_token(fee_token)
+                .fee_token(Address::repeat_byte(0x44)),
+            fee_token
+        );
     }
 
     #[test]
@@ -3494,6 +3565,69 @@ mod tests {
         assert!(provider.channel_id_to_key.lock().unwrap().is_empty());
         assert!(provider.pending_opens.lock().unwrap().is_empty());
         assert!(store.get(&store_key).await.unwrap().is_none());
+    }
+
+    #[tokio::test]
+    async fn on_chain_settlement_resolves_a_pending_open_before_the_next_voucher() {
+        use alloy::sol_types::SolValue;
+        use tempo_alloy::contracts::precompiles::TIP20_CHANNEL_RESERVE_ADDRESS;
+
+        let mut provider = make_test_provider();
+        let payee = Address::repeat_byte(0x11);
+        let currency = Address::repeat_byte(0x22);
+        let channel_id = seed_precompile_channel(&provider, payee, currency, 1_000, 10_000);
+        provider.pending_opens.lock().unwrap().insert(
+            channel_id.to_string(),
+            PendingOpen {
+                challenge_id: "open".into(),
+                store_key: None,
+            },
+        );
+        let settled =
+            alloy::primitives::Bytes::from((1_000u128, 10_000u128, 0u64).abi_encode()).to_string();
+        mock_rpc(&mut provider, &[&settled]);
+        let challenge = make_scoped_challenge(payee, currency, TIP20_CHANNEL_RESERVE_ADDRESS);
+
+        let credential = provider.pay(&challenge).await.unwrap();
+        let payload: SessionCredentialPayload =
+            serde_json::from_value(credential.payload.clone()).unwrap();
+        assert!(
+            matches!(payload, SessionCredentialPayload::Voucher { cumulative_amount, .. } if cumulative_amount == "2000")
+        );
+        assert!(provider.pending_opens.lock().unwrap().is_empty());
+    }
+
+    #[tokio::test]
+    async fn streamed_acceptance_resolves_a_covered_pending_open() {
+        let provider = make_test_provider();
+        let channel_id = seed_precompile_channel(
+            &provider,
+            Address::repeat_byte(0x11),
+            Address::repeat_byte(0x22),
+            500,
+            1_000,
+        );
+        let channel = channel_id.to_string();
+        provider.pending_opens.lock().unwrap().insert(
+            channel.clone(),
+            PendingOpen {
+                challenge_id: "open".into(),
+                store_key: None,
+            },
+        );
+
+        assert!(!provider.acknowledge_accepted(&channel, 499).await.unwrap());
+        assert!(provider
+            .pending_opens
+            .lock()
+            .unwrap()
+            .contains_key(&channel));
+        assert!(provider
+            .acknowledge_accepted(&channel.to_uppercase().replacen("0X", "0x", 1), 500)
+            .await
+            .unwrap());
+        assert!(provider.pending_opens.lock().unwrap().is_empty());
+        assert!(!provider.acknowledge_accepted(&channel, 900).await.unwrap());
     }
 
     // --- send_voucher error paths ---
@@ -4418,8 +4552,10 @@ mod tests {
             expiring_nonce_hash,
         );
 
-        let provider =
+        let mut provider =
             TempoSessionProvider::new(signer.clone(), "https://rpc.example.com").unwrap();
+        let unsettled = channel_state_response(10_000);
+        mock_rpc(&mut provider, &[&unsettled, &unsettled, &unsettled]);
 
         // Pre-seed an open precompile channel under the registry key.
         let key = TempoSessionProvider::channel_key(
