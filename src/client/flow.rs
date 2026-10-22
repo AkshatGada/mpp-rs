@@ -21,22 +21,40 @@ use super::provider::{PaymentContext, PaymentProvider, PendingPayment};
 use crate::error::MppError;
 use crate::protocol::core::accept_payment::ACCEPT_PAYMENT_HEADER;
 use crate::protocol::core::{
-    format_authorization, parse_www_authenticate_all_bytes, PaymentChallenge, PaymentCredential,
+    format_authorization, parse_receipt, parse_www_authenticate_all_bytes, PaymentChallenge,
+    PaymentCredential, Receipt,
 };
 
 /// Sends the requests of a payment flow.
-pub(crate) trait Exchange: Send {
+///
+/// Implement this to run the HTTP 402 payment flow over a transport other
+/// than a [`reqwest::Client`], such as a host application's HTTP stack. See
+/// [`send_with_exchange`].
+pub trait Exchange: Send {
     /// Error of a request that could not be sent.
     type Error: Display + Send;
 
-    /// Restricts offers before provider preparation and after preparation.
-    /// Caller-owned transports cannot safely send custom credential headers.
+    /// Restricts server challenges before provider preparation and after preparation.
+    /// Prepaid credentials are controlled separately by [`Self::allows_prepaid`].
+    ///
+    /// The default rejects custom credential headers because a caller-owned
+    /// client may forward them across redirects. Only override this restriction
+    /// when the transport enforces its own redirect-safe credential handling.
     fn check_challenge(&self, challenge: &PaymentChallenge) -> Result<(), HttpError> {
         if challenge.credential_header() == "Authorization" {
             Ok(())
         } else {
             Err(HttpError::UnsafeCredentialHeader)
         }
+    }
+
+    /// Whether the provider may prepare a credential before a server challenge.
+    ///
+    /// Defaults to true. Return false to skip
+    /// [`PaymentProvider::prepaid_credential`] entirely, for example when the
+    /// transport only admits charge challenges and cannot prepare session vouchers.
+    fn allows_prepaid(&self) -> bool {
+        true
     }
 
     /// Caller-configured client available for session management requests.
@@ -52,7 +70,8 @@ pub(crate) trait Exchange: Send {
 }
 
 /// Failure of a payment flow.
-pub(crate) enum FlowError<E> {
+#[derive(Debug)]
+pub enum FlowError<E> {
     /// The payment could not be made or reconciled.
     Payment(HttpError),
     /// A request could not be sent.
@@ -63,6 +82,38 @@ impl<E> From<HttpError> for FlowError<E> {
     fn from(error: HttpError) -> Self {
         Self::Payment(error)
     }
+}
+
+/// Outcome of a request sent with a credential prepared before any `402`.
+enum Prepaid {
+    /// The server answered the paid request.
+    Answered(Response),
+    /// The server asked for payment again; this is the unpaid request's response.
+    Unpaid(Response),
+}
+
+/// Sends `request` through `exchange`, paying any `402 Payment Required`
+/// answer with `provider` and repeating the request with the credential.
+///
+/// The returned response is the last one `exchange` produced. Request
+/// failures are returned as [`FlowError::Send`] with the exchange's own error,
+/// so callers keep its retry and delivery classification.
+pub async fn send_with_exchange<P: PaymentProvider, X: Exchange>(
+    exchange: &mut X,
+    request: Request,
+    provider: &P,
+    policy: &AcceptPaymentPolicy,
+    events: &ClientEvents,
+    max_payment_retries: usize,
+) -> Result<Response, FlowError<X::Error>> {
+    PaymentFlow {
+        provider,
+        policy,
+        events,
+        max_payment_retries,
+    }
+    .run(exchange, request, None)
+    .await
 }
 
 /// Answers `402 Payment Required` responses by paying a challenge and
@@ -89,6 +140,15 @@ impl<P: PaymentProvider> PaymentFlow<'_, P> {
             .get(ACCEPT_PAYMENT_HEADER)
             .and_then(|v| v.to_str().ok())
             .map(String::from);
+        let payment_allowed = !matches!(self.policy, AcceptPaymentPolicy::Disabled)
+            && if request.headers().contains_key(ACCEPT_PAYMENT_HEADER) {
+                caller_accept.as_deref().is_some_and(|value| {
+                    crate::protocol::core::accept_payment::parse(value)
+                        .is_ok_and(|entries| !entries.is_empty())
+                })
+            } else {
+                self.policy.allows(request.url())
+            };
         let provider_accept = self.provider.accept_payment_header();
 
         // Inject only if the caller didn't set their own header AND the
@@ -109,28 +169,49 @@ impl<P: PaymentProvider> PaymentFlow<'_, P> {
         let ranking_accept = caller_accept.or(provider_accept);
 
         let retry = request.try_clone();
-        let mut resp = match initial_response {
-            Some(response) => response,
-            None => exchange.send(request).await.map_err(FlowError::Send)?,
+        // The provider sees the request as the caller built it.
+        let payment_context = retry.as_ref().map(|retry| {
+            let mut headers = retry.headers().clone();
+            if injected {
+                headers.remove(ACCEPT_PAYMENT_HEADER);
+            }
+            PaymentContext {
+                http_client: exchange.http_client(),
+                url: retry.url().clone(),
+                headers,
+            }
+        });
+        let prepaid = match (&initial_response, &payment_context) {
+            (None, Some(context)) if payment_allowed && exchange.allows_prepaid() => {
+                self.provider.prepaid_credential(context.clone()).await
+            }
+            _ => None,
+        };
+        let mut resp = match (initial_response, prepaid, &payment_context) {
+            (Some(response), _, _) => response,
+            (None, Some((challenge, credential)), Some(context)) => match self
+                .send_prepaid(
+                    exchange,
+                    request,
+                    retry.as_ref(),
+                    context,
+                    challenge,
+                    credential,
+                )
+                .await?
+            {
+                Prepaid::Answered(response) => return Ok(response),
+                Prepaid::Unpaid(response) => response,
+            },
+            _ => exchange.send(request).await.map_err(FlowError::Send)?,
         };
 
-        if resp.status() != StatusCode::PAYMENT_REQUIRED {
+        if resp.status() != StatusCode::PAYMENT_REQUIRED || !payment_allowed {
             return Ok(resp);
         }
 
-        let Some(retry) = retry else {
+        let (Some(retry), Some(payment_context)) = (retry, payment_context) else {
             return Err(self.fail(None, HttpError::CloneFailed).await);
-        };
-
-        // The provider sees the request as the caller built it.
-        let mut headers = retry.headers().clone();
-        if injected {
-            headers.remove(ACCEPT_PAYMENT_HEADER);
-        }
-        let payment_context = PaymentContext {
-            http_client: exchange.http_client(),
-            url: retry.url().clone(),
-            headers,
         };
 
         let mut paid_challenge_ids = HashSet::new();
@@ -338,21 +419,34 @@ impl<P: PaymentProvider> PaymentFlow<'_, P> {
                     // response was lost. Preserve optimistic provider state
                     // until a later challenge can reconcile it, while
                     // releasing any delivery lease held by the provider.
-                    pending.commit().await.map_err(HttpError::Payment)?;
+                    drop(pending);
                     return Err(FlowError::Send(err));
                 }
             };
 
             let status = resp.status();
+            let receipt = paid_receipt(&resp, &challenge, &credential);
+            let session = challenge.intent.as_str() == "session";
+            let session_receipt_valid = !session || receipt.is_some();
             if status.is_success() {
+                let amount = self.charged(&payment_context, &challenge, receipt.as_ref(), session);
+                let funding_currency = self.provider.funding_currency(&challenge);
                 self.events
                     .emit(ClientEvent::PaymentResponse(PaymentResponseContext {
                         challenge,
                         credential,
                         status,
+                        url: payment_context.url.clone(),
+                        receipt: receipt.map(Box::new),
+                        amount,
+                        funding_currency,
                     }))
                     .await;
-                pending.commit().await.map_err(HttpError::Payment)?;
+                if session_receipt_valid {
+                    pending.commit().await.map_err(HttpError::Payment)?;
+                } else {
+                    drop(pending);
+                }
                 return Ok(resp);
             }
 
@@ -375,7 +469,11 @@ impl<P: PaymentProvider> PaymentFlow<'_, P> {
             }
 
             if resp.headers().contains_key("payment-receipt") {
-                pending.commit().await.map_err(HttpError::Payment)?;
+                if session_receipt_valid {
+                    pending.commit().await.map_err(HttpError::Payment)?;
+                } else {
+                    drop(pending);
+                }
             } else {
                 pending.rollback().await.map_err(HttpError::Payment)?;
             }
@@ -421,6 +519,98 @@ impl<P: PaymentProvider> PaymentFlow<'_, P> {
         })
     }
 
+    /// Sends `request` with a credential the provider prepared before any
+    /// `402`. When the server asks for payment again, or no longer knows the
+    /// session channel, the request is sent once more without it so the normal
+    /// flow pays a freshly quoted challenge.
+    async fn send_prepaid<X: Exchange>(
+        &self,
+        exchange: &mut X,
+        mut request: Request,
+        retry: Option<&Request>,
+        context: &PaymentContext,
+        challenge: PaymentChallenge,
+        credential: PaymentCredential,
+    ) -> Result<Prepaid, FlowError<X::Error>> {
+        let Ok(header) = authorization_value(&credential) else {
+            return exchange
+                .send(request)
+                .await
+                .map(Prepaid::Unpaid)
+                .map_err(FlowError::Send);
+        };
+        request.headers_mut().insert(
+            crate::client::payment_credential_header_name(&challenge),
+            header,
+        );
+        self.events
+            .emit(ClientEvent::CredentialCreated(CredentialCreatedContext {
+                challenge: challenge.clone(),
+                credential: credential.clone(),
+            }))
+            .await;
+        let resp = exchange.send(request).await.map_err(FlowError::Send)?;
+        let status = resp.status();
+        if status == StatusCode::PAYMENT_REQUIRED || status == StatusCode::GONE {
+            if status == StatusCode::GONE {
+                self.provider
+                    .invalidate_payment(&challenge, &credential)
+                    .await
+                    .map_err(HttpError::Payment)?;
+            }
+            let retry = retry
+                .and_then(Request::try_clone)
+                .ok_or(HttpError::CloneFailed)?;
+            return exchange
+                .send(retry)
+                .await
+                .map(Prepaid::Unpaid)
+                .map_err(FlowError::Send);
+        }
+        if status.is_success() {
+            let receipt = paid_receipt(&resp, &challenge, &credential);
+            let session = challenge.intent.as_str() == "session";
+            let amount = self.charged(context, &challenge, receipt.as_ref(), session);
+            let funding_currency = self.provider.funding_currency(&challenge);
+            self.events
+                .emit(ClientEvent::PaymentResponse(PaymentResponseContext {
+                    challenge,
+                    credential,
+                    status,
+                    url: context.url.clone(),
+                    receipt: receipt.map(Box::new),
+                    amount,
+                    funding_currency,
+                }))
+                .await;
+        }
+        Ok(Prepaid::Answered(resp))
+    }
+
+    /// Records a paid response's receipt and returns what the request cost: a
+    /// session's change in `spent` as the provider tracks it, or the amount a
+    /// charge challenge asked for.
+    fn charged(
+        &self,
+        context: &PaymentContext,
+        challenge: &PaymentChallenge,
+        receipt: Option<&Receipt>,
+        session: bool,
+    ) -> Option<u128> {
+        if session {
+            return receipt
+                .and_then(|receipt| self.provider.record_receipt(context, challenge, receipt));
+        }
+        challenge
+            .request
+            .decode::<serde_json::Value>()
+            .ok()?
+            .get("amount")?
+            .as_str()?
+            .parse()
+            .ok()
+    }
+
     /// Emits `payment.failed` for `error` and hands it back.
     async fn fail<E>(&self, challenge: Option<PaymentChallenge>, error: HttpError) -> FlowError<E> {
         self.events
@@ -432,6 +622,48 @@ impl<P: PaymentProvider> PaymentFlow<'_, P> {
             .await;
         FlowError::Payment(error)
     }
+}
+
+/// The receipt answering a session `credential`, when the response carries a valid one.
+/// The paid response's receipt: for a session only one that matches the
+/// challenge and the channel the credential paid from.
+fn paid_receipt(
+    resp: &Response,
+    challenge: &PaymentChallenge,
+    credential: &PaymentCredential,
+) -> Option<Receipt> {
+    if challenge.intent.as_str() == "session" {
+        return session_receipt(resp, challenge, credential);
+    }
+    resp.headers()
+        .get("payment-receipt")
+        .and_then(|v| v.to_str().ok())
+        .and_then(|v| parse_receipt(v).ok())
+}
+
+fn session_receipt(
+    resp: &Response,
+    challenge: &PaymentChallenge,
+    credential: &PaymentCredential,
+) -> Option<Receipt> {
+    resp.headers()
+        .get("payment-receipt")
+        .and_then(|v| v.to_str().ok())
+        .and_then(|v| parse_receipt(v).ok())
+        .filter(|receipt| {
+            receipt.is_success()
+                && receipt.method == challenge.method
+                && receipt
+                    .extensions
+                    .get("challengeId")
+                    .and_then(|v| v.as_str())
+                    == Some(challenge.id.as_str())
+                && credential
+                    .payload
+                    .get("channelId")
+                    .and_then(|v| v.as_str())
+                    .is_some_and(|id| receipt.reference.eq_ignore_ascii_case(id))
+        })
 }
 
 fn authorization_value(credential: &PaymentCredential) -> Result<HeaderValue, HttpError> {

@@ -18,6 +18,8 @@ use crate::MppError;
 struct Provider {
     prepared: Arc<AtomicUsize>,
     paid: Arc<Mutex<Vec<String>>>,
+    prepaid_calls: Arc<AtomicUsize>,
+    prepaid: Option<PaymentChallenge>,
     replacement: Option<PaymentChallenge>,
     refresh_first: bool,
 }
@@ -25,6 +27,20 @@ struct Provider {
 impl PaymentProvider for Provider {
     fn supports(&self, method: &str, _: &str) -> bool {
         matches!(method, "test" | "alternate")
+    }
+
+    async fn prepaid_credential(
+        &self,
+        _context: PaymentContext,
+    ) -> Option<(PaymentChallenge, PaymentCredential)> {
+        self.prepaid_calls.fetch_add(1, Ordering::SeqCst);
+        self.prepaid.clone().map(|challenge| {
+            let credential = PaymentCredential::new(
+                challenge.to_echo(),
+                PaymentPayload::hash("offline-prepaid-proof"),
+            );
+            (challenge, credential)
+        })
     }
 
     async fn prepare_http_payment_challenge(
@@ -90,6 +106,110 @@ async fn server(app: Router) -> String {
 
 fn client() -> ChargeClient {
     ChargeClient::new(Client::builder().no_proxy()).unwrap()
+}
+
+#[tokio::test]
+async fn never_requests_prepaid_credentials_and_still_pays_charge_challenges() {
+    for intent in ["session", "charge"] {
+        for header in ["Authorization", "Payment-Authorization"] {
+            for paid in [false, true] {
+                let observed = Arc::new(Mutex::new(Vec::new()));
+                let url = server(Router::new().route(
+                    "/",
+                    get({
+                        let observed = observed.clone();
+                        move |headers: HeaderMap| {
+                            let observed = observed.clone();
+                            async move {
+                                let credential = headers.get("payment-authorization").cloned();
+                                observed.lock().unwrap().push(headers);
+                                if !paid || credential.is_some() {
+                                    StatusCode::OK.into_response()
+                                } else {
+                                    offer(&[challenge(
+                                        "quoted-charge",
+                                        "charge",
+                                        "Payment-Authorization",
+                                    )])
+                                }
+                            }
+                        }
+                    }),
+                ))
+                .await;
+                let provider = Provider {
+                    prepaid: Some(challenge("prepaid", intent, header)),
+                    ..Provider::default()
+                };
+                let client = client();
+                let response = client
+                    .send_with_payment(
+                        client
+                            .request(Method::GET, url)
+                            .bearer_auth("api-key")
+                            .header(ACCEPT_PAYMENT_HEADER, "test/session, test/charge"),
+                        &provider,
+                    )
+                    .await
+                    .unwrap();
+                assert_eq!(response.status(), StatusCode::OK);
+                assert_eq!(provider.prepaid_calls.load(Ordering::SeqCst), 0);
+                assert_eq!(provider.prepared.load(Ordering::SeqCst), usize::from(paid));
+                assert_eq!(
+                    *provider.paid.lock().unwrap(),
+                    if paid { vec!["quoted-charge"] } else { vec![] }
+                );
+                let observed = observed.lock().unwrap();
+                assert_eq!(observed.len(), 1 + usize::from(paid));
+                assert!(!observed[0].contains_key("payment-authorization"));
+                for headers in observed.iter() {
+                    assert_eq!(headers["authorization"], "Bearer api-key");
+                }
+                if paid {
+                    let credential =
+                        parse_authorization(observed[1]["payment-authorization"].to_str().unwrap())
+                            .unwrap();
+                    assert_eq!(credential.challenge.id, "quoted-charge");
+                    assert_eq!(credential.challenge.intent.as_str(), "charge");
+                }
+            }
+        }
+    }
+}
+
+#[tokio::test]
+async fn legacy_fetch_keeps_prepaid_session_support() {
+    use crate::client::Fetch;
+
+    let url = server(Router::new().route(
+        "/",
+        get(|headers: HeaderMap| async move {
+            let credential =
+                parse_authorization(headers["authorization"].to_str().unwrap()).unwrap();
+            assert_eq!(credential.challenge.id, "prepaid");
+            assert_eq!(credential.challenge.intent.as_str(), "session");
+            assert!(!headers.contains_key("payment-authorization"));
+            StatusCode::OK
+        }),
+    ))
+    .await;
+    let provider = Provider {
+        prepaid: Some(challenge("prepaid", "session", "Authorization")),
+        ..Provider::default()
+    };
+    let response = Client::builder()
+        .no_proxy()
+        .build()
+        .unwrap()
+        .get(url)
+        .header(ACCEPT_PAYMENT_HEADER, "test/session")
+        .send_with_payment(&provider)
+        .await
+        .unwrap();
+    assert_eq!(response.status(), StatusCode::OK);
+    assert_eq!(provider.prepaid_calls.load(Ordering::SeqCst), 1);
+    assert_eq!(provider.prepared.load(Ordering::SeqCst), 0);
+    assert!(provider.paid.lock().unwrap().is_empty());
 }
 
 #[tokio::test]

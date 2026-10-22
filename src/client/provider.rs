@@ -6,10 +6,35 @@
 
 use crate::error::MppError;
 use crate::protocol::core::accept_payment::{self, Entry};
-use crate::protocol::core::{PaymentChallenge, PaymentCredential};
+use crate::protocol::core::{PaymentChallenge, PaymentCredential, Receipt};
 use reqwest::header::HeaderMap;
 use reqwest::Url;
 use std::future::Future;
+
+/// Work a payment event in a response stream triggers, such as sending a voucher.
+pub type PaymentEventFuture = std::pin::Pin<Box<dyn Future<Output = Result<(), MppError>> + Send>>;
+
+/// Delivery of a management credential, resolving to the receipt the resource answered with.
+pub type ManagementFuture<'a> =
+    std::pin::Pin<Box<dyn Future<Output = Result<Option<Receipt>, MppError>> + Send + 'a>>;
+
+/// Delivers a session management credential, such as a channel top-up or
+/// close, to the resource that issued its challenge.
+///
+/// HTTP resources take management credentials as an empty request to the
+/// challenged URL, which session providers send themselves from a
+/// [`PaymentContext`]. Other transports implement this trait, for example an
+/// MCP client that calls the challenged tool again with the credential in its
+/// `_meta` (see [`McpManagement`](crate::mcp::client::McpManagement)).
+pub trait ManagementTransport: Send + Sync {
+    /// Sends `credential`, which answers `challenge`, and returns the
+    /// resource's receipt. Fails when the resource rejects the credential.
+    fn send<'a>(
+        &'a self,
+        challenge: &'a PaymentChallenge,
+        credential: &'a PaymentCredential,
+    ) -> ManagementFuture<'a>;
+}
 
 /// HTTP request context available while creating a payment credential.
 ///
@@ -110,6 +135,21 @@ pub trait PaymentProvider: Clone + Send + Sync {
         self.pay(challenge)
     }
 
+    /// Execute payment like [`pay_with_context`](Self::pay_with_context), but
+    /// deliver any management credential the payment needs first, such as a
+    /// session channel top-up, through `management` instead of HTTP.
+    ///
+    /// Providers without management credentials inherit `pay_with_context`.
+    fn pay_with_management(
+        &self,
+        challenge: &PaymentChallenge,
+        context: PaymentContext,
+        management: &dyn ManagementTransport,
+    ) -> impl Future<Output = Result<PaymentCredential, MppError>> + Send {
+        let _ = management;
+        self.pay_with_context(challenge, context)
+    }
+
     /// Prepare a challenge before creating an HTTP payment credential.
     ///
     /// Providers that need interactive setup may perform it here. Returning
@@ -191,6 +231,67 @@ pub trait PaymentProvider: Clone + Send + Sync {
     /// state; this is only for resources such as delivery-ordering leases.
     fn abandon_payment(&self, challenge: &PaymentChallenge, credential: &PaymentCredential) {
         let _ = (challenge, credential);
+    }
+
+    /// Credential to send with a request before the server asks for payment.
+    ///
+    /// A session provider holding a reusable challenge for the request's URL
+    /// may return one with a fresh voucher, which saves the unpaid round trip.
+    /// A `402` answer then continues the normal payment flow. Defaults to none.
+    fn prepaid_credential(
+        &self,
+        context: PaymentContext,
+    ) -> impl Future<Output = Option<(PaymentChallenge, PaymentCredential)>> + Send {
+        let _ = context;
+        async { None }
+    }
+
+    /// Observe the receipt of a response that accepted this provider's credential.
+    ///
+    /// Session providers use the amount charged to size later prepaid vouchers.
+    fn observe_receipt(
+        &self,
+        context: &PaymentContext,
+        challenge: &PaymentChallenge,
+        receipt: &Receipt,
+    ) {
+        let _ = (context, challenge, receipt);
+    }
+
+    /// Observe a receipt like [`observe_receipt`](Self::observe_receipt) and
+    /// return what the server charged for the request, when the provider tracks
+    /// it. Session providers report the change in the channel's `spent`. The
+    /// default observes the receipt and reports nothing.
+    fn record_receipt(
+        &self,
+        context: &PaymentContext,
+        challenge: &PaymentChallenge,
+        receipt: &Receipt,
+    ) -> Option<u128> {
+        self.observe_receipt(context, challenge, receipt);
+        None
+    }
+
+    /// The token the payer spent on `challenge`'s credential, when it differs from or is not
+    /// stated by the challenge, such as MACH swapped into a charge's currency. Providers that
+    /// fund payments in the challenge currency report nothing, the default.
+    fn funding_currency(&self, challenge: &PaymentChallenge) -> Option<String> {
+        let _ = challenge;
+        None
+    }
+
+    /// Handle a named server-sent event from a paid response to `url`, such as
+    /// an mppx session's `payment-need-voucher`, and return the work it
+    /// triggers. Providers without in-stream payments return `None`, the default.
+    fn stream_event(
+        &self,
+        client: &reqwest::Client,
+        url: &str,
+        name: &str,
+        data: &str,
+    ) -> Option<PaymentEventFuture> {
+        let _ = (client, url, name, data);
+        None
     }
 
     /// Build an `Accept-Payment` header value from this provider's supported methods.
@@ -395,6 +496,29 @@ impl PaymentProvider for MultiProvider {
         )))
     }
 
+    async fn pay_with_management(
+        &self,
+        challenge: &PaymentChallenge,
+        context: PaymentContext,
+        management: &dyn ManagementTransport,
+    ) -> Result<PaymentCredential, MppError> {
+        let method = challenge.method.as_str();
+        let intent = challenge.intent.as_str();
+
+        for provider in &self.providers {
+            if provider.dyn_supports(method, intent) {
+                return provider
+                    .dyn_pay_with_management(challenge, context, management)
+                    .await;
+            }
+        }
+
+        Err(MppError::UnsupportedPaymentMethod(format!(
+            "no provider supports method={}, intent={}",
+            method, intent
+        )))
+    }
+
     async fn prepare_http_payment_challenge(
         &self,
         challenge: &PaymentChallenge,
@@ -511,6 +635,67 @@ impl PaymentProvider for MultiProvider {
         }
     }
 
+    async fn prepaid_credential(
+        &self,
+        context: PaymentContext,
+    ) -> Option<(PaymentChallenge, PaymentCredential)> {
+        for provider in &self.providers {
+            if let Some(prepaid) = provider.dyn_prepaid_credential(context.clone()).await {
+                return Some(prepaid);
+            }
+        }
+        None
+    }
+
+    fn observe_receipt(
+        &self,
+        context: &PaymentContext,
+        challenge: &PaymentChallenge,
+        receipt: &Receipt,
+    ) {
+        let method = challenge.method.as_str();
+        let intent = challenge.intent.as_str();
+
+        for provider in &self.providers {
+            if provider.dyn_supports(method, intent) {
+                provider.dyn_observe_receipt(context, challenge, receipt);
+                return;
+            }
+        }
+    }
+
+    fn record_receipt(
+        &self,
+        context: &PaymentContext,
+        challenge: &PaymentChallenge,
+        receipt: &Receipt,
+    ) -> Option<u128> {
+        let method = challenge.method.as_str();
+        let intent = challenge.intent.as_str();
+        self.providers
+            .iter()
+            .find(|provider| provider.dyn_supports(method, intent))
+            .and_then(|provider| provider.dyn_record_receipt(context, challenge, receipt))
+    }
+
+    fn stream_event(
+        &self,
+        client: &reqwest::Client,
+        url: &str,
+        name: &str,
+        data: &str,
+    ) -> Option<PaymentEventFuture> {
+        self.providers
+            .iter()
+            .find_map(|provider| provider.dyn_stream_event(client, url, name, data))
+    }
+
+    fn funding_currency(&self, challenge: &PaymentChallenge) -> Option<String> {
+        self.providers
+            .iter()
+            .find_map(|provider| provider.dyn_funding_currency(challenge))
+    }
+
     fn accept_payment_header(&self) -> Option<String> {
         let mut entries: Vec<Entry> = Vec::new();
         for provider in &self.providers {
@@ -534,6 +719,10 @@ impl PaymentProvider for MultiProvider {
 }
 
 /// Object-safe version of PaymentProvider for use in MultiProvider.
+type PrepaidFuture<'a> = std::pin::Pin<
+    Box<dyn Future<Output = Option<(PaymentChallenge, PaymentCredential)>> + Send + 'a>,
+>;
+
 trait DynPaymentProvider: Send + Sync {
     fn dyn_supports(&self, method: &str, intent: &str) -> bool;
     fn dyn_select_challenge<'a>(
@@ -548,6 +737,12 @@ trait DynPaymentProvider: Send + Sync {
         &'a self,
         challenge: &'a PaymentChallenge,
         context: PaymentContext,
+    ) -> std::pin::Pin<Box<dyn Future<Output = Result<PaymentCredential, MppError>> + Send + 'a>>;
+    fn dyn_pay_with_management<'a>(
+        &'a self,
+        challenge: &'a PaymentChallenge,
+        context: PaymentContext,
+        management: &'a dyn ManagementTransport,
     ) -> std::pin::Pin<Box<dyn Future<Output = Result<PaymentCredential, MppError>> + Send + 'a>>;
     fn dyn_prepare_http_payment_challenge<'a>(
         &'a self,
@@ -577,6 +772,27 @@ trait DynPaymentProvider: Send + Sync {
         credential: &'a PaymentCredential,
     ) -> std::pin::Pin<Box<dyn Future<Output = Result<(), MppError>> + Send + 'a>>;
     fn dyn_abandon_payment(&self, challenge: &PaymentChallenge, credential: &PaymentCredential);
+    fn dyn_prepaid_credential<'a>(&'a self, context: PaymentContext) -> PrepaidFuture<'a>;
+    fn dyn_observe_receipt(
+        &self,
+        context: &PaymentContext,
+        challenge: &PaymentChallenge,
+        receipt: &Receipt,
+    );
+    fn dyn_record_receipt(
+        &self,
+        context: &PaymentContext,
+        challenge: &PaymentChallenge,
+        receipt: &Receipt,
+    ) -> Option<u128>;
+    fn dyn_stream_event(
+        &self,
+        client: &reqwest::Client,
+        url: &str,
+        name: &str,
+        data: &str,
+    ) -> Option<PaymentEventFuture>;
+    fn dyn_funding_currency(&self, challenge: &PaymentChallenge) -> Option<String>;
     fn dyn_accept_payment_header(&self) -> Option<String>;
     fn clone_box(&self) -> Box<dyn DynPaymentProvider>;
 }
@@ -608,6 +824,18 @@ impl<P: PaymentProvider + 'static> DynPaymentProvider for P {
     ) -> std::pin::Pin<Box<dyn Future<Output = Result<PaymentCredential, MppError>> + Send + 'a>>
     {
         Box::pin(PaymentProvider::pay_with_context(self, challenge, context))
+    }
+
+    fn dyn_pay_with_management<'a>(
+        &'a self,
+        challenge: &'a PaymentChallenge,
+        context: PaymentContext,
+        management: &'a dyn ManagementTransport,
+    ) -> std::pin::Pin<Box<dyn Future<Output = Result<PaymentCredential, MppError>> + Send + 'a>>
+    {
+        Box::pin(PaymentProvider::pay_with_management(
+            self, challenge, context, management,
+        ))
     }
 
     fn dyn_prepare_http_payment_challenge<'a>(
@@ -663,6 +891,42 @@ impl<P: PaymentProvider + 'static> DynPaymentProvider for P {
 
     fn dyn_abandon_payment(&self, challenge: &PaymentChallenge, credential: &PaymentCredential) {
         PaymentProvider::abandon_payment(self, challenge, credential);
+    }
+
+    fn dyn_prepaid_credential<'a>(&'a self, context: PaymentContext) -> PrepaidFuture<'a> {
+        Box::pin(PaymentProvider::prepaid_credential(self, context))
+    }
+
+    fn dyn_observe_receipt(
+        &self,
+        context: &PaymentContext,
+        challenge: &PaymentChallenge,
+        receipt: &Receipt,
+    ) {
+        PaymentProvider::observe_receipt(self, context, challenge, receipt);
+    }
+
+    fn dyn_record_receipt(
+        &self,
+        context: &PaymentContext,
+        challenge: &PaymentChallenge,
+        receipt: &Receipt,
+    ) -> Option<u128> {
+        PaymentProvider::record_receipt(self, context, challenge, receipt)
+    }
+
+    fn dyn_stream_event(
+        &self,
+        client: &reqwest::Client,
+        url: &str,
+        name: &str,
+        data: &str,
+    ) -> Option<PaymentEventFuture> {
+        PaymentProvider::stream_event(self, client, url, name, data)
+    }
+
+    fn dyn_funding_currency(&self, challenge: &PaymentChallenge) -> Option<String> {
+        PaymentProvider::funding_currency(self, challenge)
     }
 
     fn dyn_accept_payment_header(&self) -> Option<String> {

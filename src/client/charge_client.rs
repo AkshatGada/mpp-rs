@@ -14,7 +14,8 @@ use crate::protocol::core::PaymentChallenge;
 /// This client always disables redirects, including for the initial request.
 /// A `3xx` is returned to the caller without following its `Location`. Both the
 /// initial request and every paid retry execute through the retained client.
-/// Session challenges and session management are excluded.
+/// Session challenges and session management are excluded. The provider's
+/// prepaid-credential hook is never called; payment follows a server challenge.
 ///
 /// Automatic payment requires a valid request-level `Accept-Payment` header.
 /// Client default headers do not authorize payment. Preferences, including
@@ -116,6 +117,10 @@ struct ChargeExchange<'a>(&'a Client);
 
 impl Exchange for ChargeExchange<'_> {
     type Error = HttpError;
+
+    fn allows_prepaid(&self) -> bool {
+        false
+    }
 
     fn check_challenge(&self, challenge: &PaymentChallenge) -> Result<(), HttpError> {
         if challenge.intent.as_str() != "charge" {
