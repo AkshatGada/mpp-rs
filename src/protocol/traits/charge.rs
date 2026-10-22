@@ -169,6 +169,57 @@ pub trait ChargeMethod: Clone + Send + Sync {
         request
     }
 
+    /// Compare method-specific fields with the route's expected charge request.
+    ///
+    /// The server's `*_with_expected_request` APIs call this after their core
+    /// request comparisons and before method validation or broadcast. `request`
+    /// is decoded from the credential; `expected` is supplied by the caller.
+    /// Compare only stable fields required by the method, rather than all of
+    /// `methodDetails`, since other fields may legitimately vary.
+    ///
+    /// This must be a fast, synchronous, deterministic, non-mutating comparison.
+    /// The decoded request is not yet authenticated at this stage: do not perform
+    /// network I/O or treat a successful comparison as proof of payment. Challenge
+    /// signature, expiry, body-digest, and pinned-field checks remain separate.
+    /// Returning an error stops acceptance before validation or broadcast.
+    ///
+    /// The default accepts the additional fields, preserving existing methods.
+    /// Unbound acceptance APIs do not call this hook.
+    ///
+    /// ```
+    /// # use mpp::protocol::traits::{ChargeMethod, VerificationError};
+    /// # use mpp::protocol::core::{PaymentCredential, Receipt};
+    /// # use mpp::protocol::intents::ChargeRequest;
+    /// # #[derive(Clone)]
+    /// # struct InvoiceMethod;
+    /// # impl ChargeMethod for InvoiceMethod {
+    /// # fn method(&self) -> &str { "invoice" }
+    /// fn validate_expected_request(
+    ///     &self,
+    ///     request: &ChargeRequest,
+    ///     expected: &ChargeRequest,
+    /// ) -> Result<(), VerificationError> {
+    ///     let actual_account = request.method_details.as_ref()
+    ///         .and_then(|details| details.get("merchantAccount"));
+    ///     let expected_account = expected.method_details.as_ref()
+    ///         .and_then(|details| details.get("merchantAccount"));
+    ///     if actual_account != expected_account {
+    ///         return Err(VerificationError::invalid_challenge("Merchant account mismatch"));
+    ///     }
+    ///     Ok(())
+    /// }
+    /// # async fn verify(&self, _: &PaymentCredential, _: &ChargeRequest)
+    /// #     -> Result<Receipt, VerificationError> { unimplemented!() }
+    /// # }
+    /// ```
+    fn validate_expected_request(
+        &self,
+        _request: &ChargeRequest,
+        _expected: &ChargeRequest,
+    ) -> Result<(), VerificationError> {
+        Ok(())
+    }
+
     /// Whether this method supports non-mutating validation.
     ///
     /// Existing implementations default to the legacy combined verification
