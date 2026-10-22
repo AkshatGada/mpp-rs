@@ -469,10 +469,10 @@ where
                         "Request body too large",
                     ));
                 }
-                Err(e) => {
+                Err(_) => {
                     return Ok(error_response(
                         StatusCode::BAD_REQUEST,
-                        &format!("Failed to read request body: {e}"),
+                        "Failed to read request body",
                     ));
                 }
             };

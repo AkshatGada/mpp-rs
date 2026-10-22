@@ -391,6 +391,67 @@ async fn request_body_failures_are_reported_without_verification() {
 }
 
 #[tokio::test]
+async fn request_body_read_errors_do_not_expose_backend_diagnostics() {
+    const PRIVATE_DETAIL: &str =
+        "decoder failed at /srv/private/body-store.dat; backend_token=not-a-real-token";
+
+    for problem_details in [false, true] {
+        for authorization in [false, true] {
+            let verifier = Verifier::default();
+            let application = Application::new(StatusCode::OK);
+            let body = http_body_util::StreamBody::new(futures_util::stream::iter([Err::<
+                http_body::Frame<Bytes>,
+                _,
+            >(
+                std::io::Error::other(PRIVATE_DETAIL),
+            )]));
+            let mut request = Request::builder();
+            if authorization {
+                request = request.header(header::AUTHORIZATION, "Payment mock-credential");
+            }
+            let request = request.body(body).unwrap();
+            let layer = PaymentBodyLayer::new(verifier.clone());
+            let response = if problem_details {
+                layer
+                    .with_problem_details(|json: Bytes| json.to_vec())
+                    .layer(application.clone())
+                    .call(request)
+                    .await
+                    .unwrap()
+            } else {
+                layer
+                    .layer(application.clone())
+                    .call(request)
+                    .await
+                    .unwrap()
+            };
+
+            assert_eq!(response.status(), StatusCode::BAD_REQUEST);
+            assert_eq!(response.headers()[header::CACHE_CONTROL], "no-store");
+            assert!(!response.headers().contains_key(WWW_AUTHENTICATE_HEADER));
+            assert!(!response.headers().contains_key(PAYMENT_RECEIPT_HEADER));
+            if problem_details {
+                let actual = problem(&response);
+                assert_eq!(actual.problem_type, "about:blank");
+                assert_eq!(actual.title, "Bad Request");
+                assert_eq!(actual.detail, "Failed to read request body");
+                assert!(actual.challenge_id.is_none());
+            } else {
+                assert!(response.body().is_empty());
+                assert!(!response.headers().contains_key(header::CONTENT_TYPE));
+            }
+            let response_text = std::str::from_utf8(response.body()).unwrap();
+            assert!(!response_text.contains("/srv/private/"));
+            assert!(!response_text.contains("backend_token"));
+            assert!(!response_text.contains(PRIVATE_DETAIL));
+            assert!(verifier.challenges.lock().unwrap().is_empty());
+            assert!(verifier.verified.lock().unwrap().is_empty());
+            assert_eq!(application.calls.load(Ordering::SeqCst), 0);
+        }
+    }
+}
+
+#[tokio::test]
 async fn clones_share_a_callback_that_does_not_implement_clone() {
     let calls = Mutex::new(0);
     let layer = PaymentLayer::new(Verifier::default()).with_problem_details(move |json: Bytes| {
