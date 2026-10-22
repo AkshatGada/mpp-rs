@@ -186,6 +186,9 @@ pub trait ChargeMethod: Clone + Send + Sync {
     /// The default accepts the additional fields, preserving existing methods.
     /// Unbound acceptance APIs do not call this hook.
     ///
+    /// This example requires a string `merchantAccount` in both requests while
+    /// allowing unrelated method fields to vary.
+    ///
     /// ```
     /// # use mpp::protocol::traits::{ChargeMethod, VerificationError};
     /// # use mpp::protocol::core::{PaymentCredential, Receipt};
@@ -200,16 +203,39 @@ pub trait ChargeMethod: Clone + Send + Sync {
     ///     expected: &ChargeRequest,
     /// ) -> Result<(), VerificationError> {
     ///     let actual_account = request.method_details.as_ref()
-    ///         .and_then(|details| details.get("merchantAccount"));
+    ///         .and_then(|details| details.get("merchantAccount"))
+    ///         .and_then(|account| account.as_str());
     ///     let expected_account = expected.method_details.as_ref()
-    ///         .and_then(|details| details.get("merchantAccount"));
-    ///     if actual_account != expected_account {
+    ///         .and_then(|details| details.get("merchantAccount"))
+    ///         .and_then(|account| account.as_str());
+    ///     if actual_account.is_none() || actual_account != expected_account {
     ///         return Err(VerificationError::invalid_challenge("Merchant account mismatch"));
     ///     }
     ///     Ok(())
     /// }
     /// # async fn verify(&self, _: &PaymentCredential, _: &ChargeRequest)
     /// #     -> Result<Receipt, VerificationError> { unimplemented!() }
+    /// # }
+    /// # let method = InvoiceMethod;
+    /// # let request = |details| ChargeRequest { method_details: details, ..Default::default() };
+    /// # let expected = request(Some(serde_json::json!({"merchantAccount": "merchant-a", "quote": "old"})));
+    /// # let matching = request(Some(serde_json::json!({"merchantAccount": "merchant-a", "quote": "new"})));
+    /// # assert!(method.validate_expected_request(&matching, &expected).is_ok());
+    /// # let other = request(Some(serde_json::json!({"merchantAccount": "merchant-b"})));
+    /// # assert!(method.validate_expected_request(&other, &expected).is_err());
+    /// # for details in [
+    /// #     None,
+    /// #     Some(serde_json::json!({})),
+    /// #     Some(serde_json::json!({"merchantAccount": null})),
+    /// #     Some(serde_json::json!({"merchantAccount": 123})),
+    /// #     Some(serde_json::json!({"merchantAccount": true})),
+    /// #     Some(serde_json::json!({"merchantAccount": []})),
+    /// #     Some(serde_json::json!({"merchantAccount": {}})),
+    /// # ] {
+    /// #     let invalid = request(details);
+    /// #     assert!(method.validate_expected_request(&invalid, &expected).is_err());
+    /// #     assert!(method.validate_expected_request(&expected, &invalid).is_err());
+    /// #     assert!(method.validate_expected_request(&invalid, &invalid).is_err());
     /// # }
     /// ```
     fn validate_expected_request(

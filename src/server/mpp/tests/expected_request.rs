@@ -424,6 +424,74 @@ async fn unbound_apis_do_not_call_the_expected_request_hook() {
 }
 
 #[tokio::test]
+async fn legacy_binding_hook_runs_before_default_broadcast_delegates_to_verify() {
+    #[derive(Clone)]
+    struct LegacyBindingMethod {
+        calls: Arc<Mutex<Vec<&'static str>>>,
+        reject_binding: bool,
+    }
+
+    impl ChargeMethod for LegacyBindingMethod {
+        fn method(&self) -> &str {
+            "mock"
+        }
+
+        fn validate_expected_request(
+            &self,
+            _: &ChargeRequest,
+            _: &ChargeRequest,
+        ) -> std::result::Result<(), VerificationError> {
+            self.calls.lock().unwrap().push("binding");
+            if self.reject_binding {
+                return Err(VerificationError::invalid_challenge(
+                    "legacy binding rejected",
+                ));
+            }
+            Ok(())
+        }
+
+        async fn verify(
+            &self,
+            _: &PaymentCredential,
+            _: &ChargeRequest,
+        ) -> std::result::Result<Receipt, VerificationError> {
+            self.calls.lock().unwrap().push("verify");
+            Ok(Receipt::success("mock", "legacy_ref"))
+        }
+    }
+
+    for entry in EntryPoint::ALL
+        .into_iter()
+        .filter(|entry| !entry.validates_only())
+    {
+        for reject_binding in [false, true] {
+            let calls = Arc::new(Mutex::new(Vec::new()));
+            let payment = Mpp::new(
+                LegacyBindingMethod {
+                    calls: Arc::clone(&calls),
+                    reject_binding,
+                },
+                "api.example.com",
+                TEST_SECRET,
+            );
+            assert!(!payment.method.supports_validation());
+            let request = request();
+            let credential = credential(&request, entry.uses_body().then_some(b"body"));
+            let result = entry.run(&payment, &credential, &request, b"body").await;
+            if reject_binding {
+                let error = result.unwrap_err();
+                assert_eq!(error.code, Some(ErrorCode::InvalidChallenge));
+                assert_eq!(error.message, "legacy binding rejected");
+                assert_eq!(*calls.lock().unwrap(), ["binding"], "{entry:?}");
+            } else {
+                result.unwrap();
+                assert_eq!(*calls.lock().unwrap(), ["binding", "verify"], "{entry:?}");
+            }
+        }
+    }
+}
+
+#[tokio::test]
 async fn legacy_method_without_binding_override_keeps_accepting_additional_fields() {
     for entry in EntryPoint::ALL {
         let seen_request = Arc::new(Mutex::new(None));
