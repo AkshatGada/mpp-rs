@@ -158,6 +158,7 @@ pub struct TempoProvider {
     autoswap: Option<AutoswapConfig>,
     expected_chain_id: Option<u64>,
     rpc_chain_id: Arc<OnceCell<u64>>,
+    trusted_tempo_proof_realms: Vec<(reqwest::Url, String)>,
 }
 
 impl TempoProvider {
@@ -181,12 +182,23 @@ impl TempoProvider {
             autoswap: None,
             expected_chain_id: None,
             rpc_chain_id: Arc::new(OnceCell::new()),
+            trusted_tempo_proof_realms: Vec::new(),
         })
     }
 
     /// Set an optional client identifier for attribution memos.
     pub fn with_client_id(mut self, client_id: impl Into<String>) -> Self {
         self.client_id = Some(client_id.into());
+        self
+    }
+
+    /// Trust a non-hostname proof realm only at the specified HTTP origin.
+    pub fn with_trusted_tempo_proof_realm(
+        mut self,
+        origin: reqwest::Url,
+        realm: impl Into<String>,
+    ) -> Self {
+        self.set_trusted_tempo_proof_realm(origin, realm.into());
         self
     }
 
@@ -277,6 +289,19 @@ impl PaymentProvider for TempoProvider {
             && intent == crate::protocol::methods::tempo::INTENT_CHARGE
     }
 
+    fn trusted_tempo_proof_realm(&self, url: &reqwest::Url) -> Option<&str> {
+        self.trusted_tempo_proof_realms
+            .iter()
+            .find(|(origin, _)| origin.origin() == url.origin())
+            .map(|(_, realm)| realm.as_str())
+    }
+
+    fn set_trusted_tempo_proof_realm(&mut self, origin: reqwest::Url, realm: String) {
+        self.trusted_tempo_proof_realms
+            .retain(|(existing, _)| existing.origin() != origin.origin());
+        self.trusted_tempo_proof_realms.push((origin, realm));
+    }
+
     async fn pay(&self, challenge: &PaymentChallenge) -> Result<PaymentCredential, MppError> {
         let from = self
             .signing_mode
@@ -329,6 +354,38 @@ mod tests {
 
         assert_eq!(provider.rpc_url().as_str(), "https://rpc.example.com/");
         assert_eq!(provider.signer().address(), signer.address());
+    }
+
+    #[test]
+    fn trusted_proof_realm_is_scoped_to_origin() {
+        let provider = TempoProvider::new(
+            alloy::signers::local::PrivateKeySigner::random(),
+            "https://rpc.example.com",
+        )
+        .unwrap()
+        .with_trusted_tempo_proof_realm("https://api.example.com".parse().unwrap(), "MPP Payment");
+        assert_eq!(
+            provider.trusted_tempo_proof_realm(&"https://api.example.com/pay".parse().unwrap()),
+            Some("MPP Payment")
+        );
+        assert_eq!(
+            provider.trusted_tempo_proof_realm(&"https://attacker.example.com".parse().unwrap()),
+            None
+        );
+        assert_eq!(
+            provider.trusted_tempo_proof_realm(&"http://api.example.com".parse().unwrap()),
+            None
+        );
+
+        let updated = provider.with_trusted_tempo_proof_realm(
+            "https://api.example.com/other".parse().unwrap(),
+            "new realm",
+        );
+        assert_eq!(updated.trusted_tempo_proof_realms.len(), 1);
+        assert_eq!(
+            updated.trusted_tempo_proof_realm(&"https://api.example.com/pay".parse().unwrap()),
+            Some("new realm")
+        );
     }
 
     #[test]
