@@ -304,6 +304,10 @@ async fn challenge_failures_return_generic_500_without_challenge() {
 async fn default_layers_keep_empty_bodies_and_existing_types() {
     let _: PaymentLayer<Verifier> = PaymentLayer::new(Verifier::default());
     let _: PaymentBodyLayer<Verifier> = PaymentBodyLayer::new(Verifier::default());
+    let _: PaymentService<Application, Verifier> =
+        PaymentLayer::new(Verifier::default()).layer(Application::new(StatusCode::OK));
+    let _: PaymentBodyService<Application, Verifier> =
+        PaymentBodyLayer::new(Verifier::default()).layer(Application::new(StatusCode::OK));
     for body_aware in [false, true] {
         for failure in [Failure::Expired, Failure::Internal] {
             for authorization in [false, true] {
@@ -449,6 +453,87 @@ async fn request_body_read_errors_do_not_expose_backend_diagnostics() {
             assert_eq!(application.calls.load(Ordering::SeqCst), 0);
         }
     }
+}
+
+#[tokio::test]
+async fn default_body_limit_responses_are_empty_and_not_cacheable() {
+    let verifier = Verifier::default();
+    let application = Application::new(StatusCode::OK);
+    let response = PaymentBodyLayer::new(verifier.clone())
+        .max_body_bytes(2)
+        .layer(application.clone())
+        .call(Request::new(http_body_util::Full::new(Bytes::from_static(
+            b"large",
+        ))))
+        .await
+        .unwrap();
+    assert_eq!(response.status(), StatusCode::PAYLOAD_TOO_LARGE);
+    assert_eq!(response.headers()[header::CACHE_CONTROL], "no-store");
+    assert!(response.body().is_empty());
+    assert!(!response.headers().contains_key(header::CONTENT_TYPE));
+    assert!(!response.headers().contains_key(WWW_AUTHENTICATE_HEADER));
+    assert!(!response.headers().contains_key(PAYMENT_RECEIPT_HEADER));
+    assert!(verifier.challenges.lock().unwrap().is_empty());
+    assert!(verifier.verified.lock().unwrap().is_empty());
+    assert_eq!(application.calls.load(Ordering::SeqCst), 0);
+}
+
+#[tokio::test]
+async fn body_limit_can_be_configured_before_or_after_problem_details() {
+    fn json_body(json: Bytes) -> Vec<u8> {
+        json.to_vec()
+    }
+    for configure_after in [false, true] {
+        let layer = PaymentBodyLayer::new(Verifier::default());
+        let layer = if configure_after {
+            layer.with_problem_details(json_body).max_body_bytes(2)
+        } else {
+            layer.max_body_bytes(2).with_problem_details(json_body)
+        };
+        let _: &PaymentBodyLayer<Verifier, _> = &layer;
+        let response = layer
+            .clone()
+            .layer(Application::new(StatusCode::OK))
+            .call(Request::new(http_body_util::Full::new(Bytes::from_static(
+                b"large",
+            ))))
+            .await
+            .unwrap();
+        assert_eq!(response.status(), StatusCode::PAYLOAD_TOO_LARGE);
+        assert_eq!(problem(&response).title, "Payload Too Large");
+    }
+}
+
+#[tokio::test]
+async fn opt_in_layer_preserves_inner_payment_layers_empty_response() {
+    let outer = Verifier::default();
+    let inner = Verifier {
+        failure: Some(Failure::Expired),
+        ..Verifier::default()
+    };
+    let application = Application::new(StatusCode::OK);
+    let response = PaymentLayer::new(outer.clone())
+        .with_problem_details(|json: Bytes| json.to_vec())
+        .layer(PaymentLayer::new(inner.clone()).layer(application.clone()))
+        .call(
+            Request::builder()
+                .header(header::AUTHORIZATION, "Payment mock-credential")
+                .body(())
+                .unwrap(),
+        )
+        .await
+        .unwrap();
+    assert_eq!(response.status(), StatusCode::PAYMENT_REQUIRED);
+    assert!(response.body().is_empty());
+    assert!(!response.headers().contains_key(header::CONTENT_TYPE));
+    assert_eq!(response.headers()[header::CACHE_CONTROL], "no-store");
+    assert!(response.headers().contains_key(WWW_AUTHENTICATE_HEADER));
+    assert!(!response.headers().contains_key(PAYMENT_RECEIPT_HEADER));
+    assert!(outer.challenges.lock().unwrap().is_empty());
+    assert_eq!(outer.verified.lock().unwrap().len(), 1);
+    assert_eq!(inner.verified.lock().unwrap().len(), 1);
+    assert_eq!(inner.challenges.lock().unwrap().len(), 1);
+    assert_eq!(application.calls.load(Ordering::SeqCst), 0);
 }
 
 #[tokio::test]
