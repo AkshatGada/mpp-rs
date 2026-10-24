@@ -855,6 +855,7 @@ impl PaymentBodyLayer<ChargeVerifier> {
         Ok(Self {
             verifier: layer.verifier,
             max_body_bytes: DEFAULT_MAX_BODY_BYTES,
+            body: (),
         })
     }
 }
