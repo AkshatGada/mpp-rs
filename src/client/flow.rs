@@ -5,7 +5,7 @@ use std::collections::HashSet;
 use std::fmt::Display;
 use std::future::Future;
 
-use reqwest::header::{HeaderValue, WWW_AUTHENTICATE};
+use reqwest::header::{HeaderMap, HeaderValue, HOST, WWW_AUTHENTICATE};
 use reqwest::{Request, Response, StatusCode};
 
 use super::accept_payment_policy::AcceptPaymentPolicy;
@@ -307,6 +307,15 @@ impl<P: PaymentProvider> PaymentFlow<'_, P> {
                     return Err(self.fail(Some(challenge), HttpError::Payment(err)).await);
                 }
             };
+            if is_cross_realm_proof_with_trust(
+                &challenge,
+                &payment_context.url,
+                &payment_context.headers,
+                self.provider
+                    .trusted_tempo_proof_realm(&payment_context.url),
+            ) {
+                return Err(self.fail(Some(challenge), HttpError::CrossRealmProof).await);
+            }
             // The caller owns reqwest's redirect policy, which cannot be changed
             // for one request. Unlike Authorization, reqwest preserves this
             // custom header across origins. Reject before the provider pays.
@@ -569,6 +578,41 @@ impl<P: PaymentProvider> PaymentFlow<'_, P> {
             .await;
         FlowError::Payment(error)
     }
+}
+
+/// Whether a zero-amount Tempo challenge names a different host than the caller's request.
+pub fn is_cross_realm_proof(
+    challenge: &PaymentChallenge,
+    url: &reqwest::Url,
+    headers: &HeaderMap,
+) -> bool {
+    is_cross_realm_proof_with_trust(challenge, url, headers, None)
+}
+
+/// Apply an explicit caller-pinned proof realm for a known HTTP origin.
+pub fn is_cross_realm_proof_with_trust(
+    challenge: &PaymentChallenge,
+    url: &reqwest::Url,
+    headers: &HeaderMap,
+    trusted_realm: Option<&str>,
+) -> bool {
+    let requested_host = headers
+        .get(HOST)
+        .and_then(|value| value.to_str().ok())
+        .and_then(|value| reqwest::Url::parse(&format!("http://{value}")).ok())
+        .and_then(|host| host.host_str().map(str::to_owned))
+        .or_else(|| url.host_str().map(str::to_owned))
+        .unwrap_or_default();
+    challenge.method.as_str() == "tempo"
+        && challenge.intent.as_str() == "charge"
+        && challenge
+            .request
+            .decode::<crate::protocol::intents::ChargeRequest>()
+            .ok()
+            .and_then(|request| request.parse_amount().ok())
+            == Some(0)
+        && !challenge.realm.eq_ignore_ascii_case(&requested_host)
+        && trusted_realm != Some(challenge.realm.as_str())
 }
 
 /// The receipt answering a session `credential`, when the response carries a valid one.

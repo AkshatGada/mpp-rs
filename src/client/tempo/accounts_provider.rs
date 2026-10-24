@@ -50,6 +50,7 @@ pub struct TempoAccountsProvider {
     session_settings: SessionSettings,
     /// Settlement RPC clients by URL, shared by clones so payments reuse connections.
     rpc_providers: Arc<Mutex<HashMap<reqwest::Url, RootProvider<TempoNetwork>>>>,
+    trusted_tempo_proof_realms: Vec<(reqwest::Url, String)>,
 }
 
 #[derive(Clone)]
@@ -86,6 +87,7 @@ impl TempoAccountsProvider {
             session: None,
             session_settings: SessionSettings::default(),
             rpc_providers: Arc::new(Mutex::new(HashMap::new())),
+            trusted_tempo_proof_realms: Vec::new(),
         }
     }
 
@@ -112,6 +114,16 @@ impl TempoAccountsProvider {
     /// Set an optional client identifier for attribution memos.
     pub fn with_client_id(mut self, client_id: impl Into<String>) -> Self {
         self.client_id = Some(client_id.into());
+        self
+    }
+
+    /// Trust a non-hostname proof realm only at the specified HTTP origin.
+    pub fn with_trusted_tempo_proof_realm(
+        mut self,
+        origin: reqwest::Url,
+        realm: impl Into<String>,
+    ) -> Self {
+        self.set_trusted_tempo_proof_realm(origin, realm.into());
         self
     }
 
@@ -203,6 +215,9 @@ impl TempoAccountsProvider {
             })
             .with_authorized_signer(access_key)
             .with_channel_store(channel_store);
+        for (origin, realm) in &self.trusted_tempo_proof_realms {
+            provider = provider.with_trusted_tempo_proof_realm(origin.clone(), realm.clone());
+        }
         if let Some(config) = &self.autoswap {
             provider = provider.with_autoswap(config.clone());
         }
@@ -365,7 +380,9 @@ impl TempoAccountsProvider {
             MppError::InvalidConfig("Tempo Accounts session state is unavailable".to_owned())
         })?;
         if let Some(provider) = cached.as_ref() {
-            return Ok(provider.clone());
+            let mut provider = provider.clone();
+            provider.replace_trusted_tempo_proof_realms(&self.trusted_tempo_proof_realms);
+            return Ok(provider);
         }
         let settings = &self.session_settings;
         let mut provider = self.session_provider(session.store.clone())?;
@@ -387,7 +404,9 @@ impl TempoAccountsProvider {
         if let Some(events) = &settings.events {
             provider = provider.with_events(events.clone());
         }
-        *cached = Some(provider.clone());
+        let mut shared = provider.clone();
+        shared.replace_trusted_tempo_proof_realms(&[]);
+        *cached = Some(shared);
         Ok(provider)
     }
 
@@ -512,6 +531,19 @@ impl PaymentProvider for TempoAccountsProvider {
             && (intent == crate::protocol::methods::tempo::INTENT_CHARGE
                 || (intent == crate::protocol::methods::tempo::INTENT_SESSION
                     && self.session.is_some()))
+    }
+
+    fn trusted_tempo_proof_realm(&self, url: &reqwest::Url) -> Option<&str> {
+        self.trusted_tempo_proof_realms
+            .iter()
+            .find(|(origin, _)| origin.origin() == url.origin())
+            .map(|(_, realm)| realm.as_str())
+    }
+
+    fn set_trusted_tempo_proof_realm(&mut self, origin: reqwest::Url, realm: String) {
+        self.trusted_tempo_proof_realms
+            .retain(|(existing, _)| existing.origin() != origin.origin());
+        self.trusted_tempo_proof_realms.push((origin, realm));
     }
 
     fn select_challenge<'a>(
@@ -844,6 +876,65 @@ mod tests {
         assert!(session.supports("tempo", "session"));
         assert_eq!(session.signer().address(), expected_key);
         assert_eq!(session.autoswap().unwrap().token_in, swap_token);
+        std::fs::remove_file(path).unwrap();
+    }
+
+    #[test]
+    fn cached_session_uses_updated_proof_realm_pin() {
+        let (provider, path, _) = provider();
+        let origin = reqwest::Url::parse("https://api.example").unwrap();
+        let request = reqwest::Url::parse("https://api.example/pay").unwrap();
+        let provider = provider
+            .with_expected_chain_id(4217)
+            .with_session_store(Arc::new(
+                super::super::session::store::MemoryChannelStore::default(),
+            ));
+        let initial = provider.session().unwrap();
+        assert_eq!(initial.trusted_tempo_proof_realm(&request), None);
+
+        let mut provider = provider.with_trusted_tempo_proof_realm(origin.clone(), "first");
+        assert_eq!(
+            provider
+                .session()
+                .unwrap()
+                .trusted_tempo_proof_realm(&request),
+            Some("first")
+        );
+
+        provider.set_trusted_tempo_proof_realm(origin, "updated".into());
+        let updated = provider.session().unwrap();
+        assert_eq!(updated.trusted_tempo_proof_realm(&request), Some("updated"));
+        assert_eq!(provider.trusted_tempo_proof_realms.len(), 1);
+        std::fs::remove_file(path).unwrap();
+    }
+
+    #[test]
+    fn cached_session_does_not_share_realm_pins_across_account_clones() {
+        let (provider, path, _) = provider();
+        let origin = reqwest::Url::parse("https://api.example").unwrap();
+        let request = reqwest::Url::parse("https://api.example/pay").unwrap();
+        let unpinned = provider
+            .with_expected_chain_id(4217)
+            .with_session_store(Arc::new(
+                super::super::session::store::MemoryChannelStore::default(),
+            ));
+        let pinned = unpinned
+            .clone()
+            .with_trusted_tempo_proof_realm(origin, "other clone's realm");
+        assert_eq!(
+            pinned
+                .session()
+                .unwrap()
+                .trusted_tempo_proof_realm(&request),
+            Some("other clone's realm")
+        );
+        assert_eq!(
+            unpinned
+                .session()
+                .unwrap()
+                .trusted_tempo_proof_realm(&request),
+            None
+        );
         std::fs::remove_file(path).unwrap();
     }
 

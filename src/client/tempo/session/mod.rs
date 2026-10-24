@@ -145,6 +145,7 @@ pub struct TempoSessionProvider {
     spend: Arc<Mutex<SpendLedger>>,
     /// Receives `channel.deposit` events for accepted opens and top-ups.
     events: ClientEvents,
+    trusted_tempo_proof_realms: Vec<(reqwest::Url, String)>,
 }
 
 /// Work a session SSE event triggers, such as sending a voucher.
@@ -287,6 +288,7 @@ impl TempoSessionProvider {
             topping_up: Arc::new(Mutex::new(HashSet::new())),
             spend: Arc::default(),
             events: ClientEvents::default(),
+            trusted_tempo_proof_realms: Vec::new(),
         })
     }
 
@@ -309,6 +311,21 @@ impl TempoSessionProvider {
             last: ledger.last,
             remaining,
         }
+    }
+
+    /// Trust a non-hostname proof realm only at the specified HTTP origin.
+    pub fn with_trusted_tempo_proof_realm(
+        mut self,
+        origin: reqwest::Url,
+        realm: impl Into<String>,
+    ) -> Self {
+        self.set_trusted_tempo_proof_realm(origin, realm.into());
+        self
+    }
+
+    /// Replace the caller-specific pins on a session cloned from shared channel state.
+    pub(crate) fn replace_trusted_tempo_proof_realms(&mut self, realms: &[(reqwest::Url, String)]) {
+        self.trusted_tempo_proof_realms = realms.to_vec();
     }
 
     /// Handle an mppx session SSE event from a response to `url`: answer
@@ -1254,6 +1271,20 @@ impl TempoSessionProvider {
             let Some(challenge) = challenge else {
                 return Ok(None);
             };
+
+            if reqwest::Url::parse(url).ok().is_none_or(|requested| {
+                requested.origin() != challenge_response.url().origin()
+                    || crate::client::flow::is_cross_realm_proof_with_trust(
+                        &challenge,
+                        &requested,
+                        &headers,
+                        self.trusted_tempo_proof_realm(&requested),
+                    )
+            }) {
+                return Err(MppError::InvalidConfig(
+                    "refusing to sign a session bootstrap proof for a different HTTP origin or realm".into(),
+                ));
+            }
 
             ensure_redirect_safe_credential_header(&challenge)?;
             let request: ChargeRequest = challenge.request.decode()?;
@@ -3178,6 +3209,19 @@ impl PaymentProvider for TempoSessionProvider {
             && intent == crate::protocol::methods::tempo::INTENT_SESSION
     }
 
+    fn trusted_tempo_proof_realm(&self, url: &reqwest::Url) -> Option<&str> {
+        self.trusted_tempo_proof_realms
+            .iter()
+            .find(|(origin, _)| origin.origin() == url.origin())
+            .map(|(_, realm)| realm.as_str())
+    }
+
+    fn set_trusted_tempo_proof_realm(&mut self, origin: reqwest::Url, realm: String) {
+        self.trusted_tempo_proof_realms
+            .retain(|(existing, _)| existing.origin() != origin.origin());
+        self.trusted_tempo_proof_realms.push((origin, realm));
+    }
+
     async fn pay(&self, challenge: &PaymentChallenge) -> Result<PaymentCredential, MppError> {
         self.payment_credential(challenge, None).await
     }
@@ -3455,6 +3499,19 @@ mod tests {
             "https://rpc.moderato.tempo.xyz/"
         );
         assert_eq!(provider.signer().address(), signer.address());
+    }
+
+    #[test]
+    fn repeated_realm_pins_replace_prior_realm() {
+        let origin = reqwest::Url::parse("https://api.example.test").unwrap();
+        let request = reqwest::Url::parse("https://api.example.test/pay").unwrap();
+        let provider =
+            TempoSessionProvider::new(PrivateKeySigner::random(), "https://rpc.example.com")
+                .unwrap()
+                .with_trusted_tempo_proof_realm(origin.clone(), "old")
+                .with_trusted_tempo_proof_realm(origin, "new");
+        assert_eq!(provider.trusted_tempo_proof_realms.len(), 1);
+        assert_eq!(provider.trusted_tempo_proof_realm(&request), Some("new"));
     }
 
     #[test]
@@ -6242,7 +6299,7 @@ mod tests {
         let chain_id = 4217;
         let challenge = PaymentChallenge::new(
             "bootstrap-proof",
-            "openai.example.com",
+            "127.0.0.1",
             crate::protocol::methods::tempo::METHOD_NAME,
             crate::protocol::methods::tempo::INTENT_CHARGE,
             Base64UrlJson::from_value(&serde_json::json!({
@@ -6286,7 +6343,7 @@ mod tests {
                                     root,
                                     chain_id,
                                     "bootstrap-proof",
-                                    "openai.example.com",
+                                    "127.0.0.1",
                                     payload.proof_signature()?,
                                 )
                                 .ok()?;
