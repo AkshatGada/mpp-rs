@@ -78,7 +78,6 @@ use bytes::Bytes;
 use http_types::{header, HeaderValue, StatusCode};
 
 use crate::error::{MppError, PaymentError, PaymentErrorDetails};
-#[cfg(any(feature = "stripe", feature = "tempo"))]
 use crate::protocol::core::headers::parse_authorization;
 use crate::protocol::core::headers::{
     extract_payment_scheme, format_receipt, format_www_authenticate, with_private_cache_control,
@@ -437,18 +436,30 @@ pub trait ChargeChallenger: Send + Sync + 'static {
     }
 
     /// Verify a credential string against route amount and framework scope.
+    ///
+    /// With a scope, the default re-issues this route's challenge with
+    /// [`challenge`](Self::challenge) and rejects a credential whose echoed
+    /// challenge does not carry the route's scope in `_mppx_scope` or whose
+    /// method, intent or pinned request fields (amount, currency, recipient
+    /// and method details, as in mppx) differ from it, so a credential issued for
+    /// another route, amount or HTTP method is rejected, as mppx's
+    /// `verifyCredential` does. It then delegates to
+    /// [`verify_payment_for_amount`](Self::verify_payment_for_amount), which
+    /// must authenticate the echoed challenge (e.g. its HMAC `id`): that is
+    /// what binds the echoed request to a challenge the server issued.
+    /// Override this method if `challenge` output is not deterministic for a
+    /// given amount and scope.
     fn verify_payment_for_amount_and_scope(
         &self,
         credential_str: &str,
         amount: &str,
         mppx_scope: Option<serde_json::Value>,
     ) -> std::pin::Pin<Box<dyn std::future::Future<Output = Result<Receipt, String>> + Send>> {
-        if mppx_scope.is_some() {
-            let _ = credential_str;
-            let _ = amount;
-            return Box::pin(std::future::ready(Err(
-                "framework scope verification is not implemented for this ChargeChallenger".into(),
-            )));
+        if let Some(scope) = mppx_scope {
+            let expected = self.challenge(amount, scoped_challenge_options(&scope));
+            if let Err(e) = check_route_binding(credential_str, &scope, expected) {
+                return Box::pin(std::future::ready(Err(e)));
+            }
         }
         self.verify_payment_for_amount(credential_str, amount)
     }
@@ -465,6 +476,13 @@ pub trait ChargeChallenger: Send + Sync + 'static {
     }
 
     /// Verify a credential string against route amount, framework scope, and request body bytes.
+    ///
+    /// The default checks the credential against this route's challenge as
+    /// [`verify_payment_for_amount_and_scope`](Self::verify_payment_for_amount_and_scope)
+    /// does, re-issuing it with
+    /// [`challenge_with_body`](Self::challenge_with_body) so its body
+    /// `digest` must match too, then delegates to
+    /// [`verify_payment_for_amount_with_body`](Self::verify_payment_for_amount_with_body).
     fn verify_payment_for_amount_scope_and_body(
         &self,
         credential_str: &str,
@@ -472,13 +490,11 @@ pub trait ChargeChallenger: Send + Sync + 'static {
         mppx_scope: Option<serde_json::Value>,
         body: &[u8],
     ) -> std::pin::Pin<Box<dyn std::future::Future<Output = Result<Receipt, String>> + Send>> {
-        if mppx_scope.is_some() {
-            let _ = credential_str;
-            let _ = amount;
-            let _ = body;
-            return Box::pin(std::future::ready(Err(
-                "framework scope verification is not implemented for this ChargeChallenger".into(),
-            )));
+        if let Some(scope) = mppx_scope {
+            let expected = self.challenge_with_body(amount, scoped_challenge_options(&scope), body);
+            if let Err(e) = check_route_binding(credential_str, &scope, expected) {
+                return Box::pin(std::future::ready(Err(e)));
+            }
         }
         self.verify_payment_for_amount_with_body(credential_str, amount, body)
     }
@@ -1246,6 +1262,70 @@ fn request_realm_from_parts(parts: &http_types::request::Parts) -> Option<String
         return None;
     }
     Some(authority.host().to_ascii_lowercase())
+}
+
+/// Challenge options the default scoped verifiers re-issue a route's challenge with.
+fn scoped_challenge_options(scope: &serde_json::Value) -> ChallengeOptions {
+    ChallengeOptions {
+        mppx_scope: Some(scope.clone()),
+        ..Default::default()
+    }
+}
+
+/// Reject a credential whose echoed challenge was not issued for this route.
+///
+/// Mirrors mppx's `verifyCredential`, which rejects a credential whose
+/// challenge scope differs from the route's and then compares the route's
+/// re-issued challenge with the echoed one (`getChallengeBindingMismatch`).
+fn check_route_binding(
+    credential_str: &str,
+    scope: &serde_json::Value,
+    expected: Result<PaymentChallenge, String>,
+) -> Result<(), String> {
+    let echo = parse_authorization(credential_str)
+        .map_err(|e| e.to_string())?
+        .challenge;
+    let request = echo.request.decode_value().map_err(|e| e.to_string())?;
+    if request.get("_mppx_scope") != Some(scope) {
+        return Err("credential scope does not match this route's requirements".into());
+    }
+    let expected = expected?;
+    let expected_request = expected.request.decode_value().map_err(|e| e.to_string())?;
+    if echo.method != expected.method
+        || echo.intent != expected.intent
+        || pinned_request_binding(&request) != pinned_request_binding(&expected_request)
+        || echo.digest != expected.digest
+    {
+        return Err("credential request does not match this route's requirements".into());
+    }
+    Ok(())
+}
+
+/// The request fields a credential must share with the route's challenge.
+///
+/// Mirrors mppx's `getPinnedRequestBinding`: only the economically
+/// significant fields are compared, read from the request or its
+/// `methodDetails`, so fields such as `description` that the re-issued
+/// challenge may lack do not reject a valid credential. The HMAC check in
+/// `verify_payment` covers the rest of the echoed request.
+fn pinned_request_binding(request: &serde_json::Value) -> Vec<Option<&serde_json::Value>> {
+    let details = request.get("methodDetails");
+    let field = |name: &str| {
+        request
+            .get(name)
+            .or_else(|| details.and_then(|d| d.get(name)))
+    };
+    let detail = |name: &str| details.and_then(|d| d.get(name));
+    vec![
+        field("amount"),
+        field("currency"),
+        field("recipient"),
+        field("chainId"),
+        detail("memo"),
+        detail("sessionProtocol"),
+        detail("splits"),
+        field("unitType"),
+    ]
 }
 
 fn mppx_scope_from_parts(parts: &http_types::request::Parts) -> Option<serde_json::Value> {
