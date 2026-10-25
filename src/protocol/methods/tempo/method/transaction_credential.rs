@@ -251,6 +251,22 @@ where
             .map_err(|e| VerificationError::new(format!("Failed to recover sender: {e}")))
     }
 
+    /// Look up the receipt of a transaction whose synchronous broadcast
+    /// returned an RPC error: the node may have included it before its reply
+    /// failed. Returns `None` when there is no receipt for exactly this hash,
+    /// so the caller reports the original broadcast error.
+    async fn recover_broadcast_receipt(
+        &self,
+        tx_hash: B256,
+    ) -> Option<<TempoNetwork as alloy::network::Network>::ReceiptResponse> {
+        let receipt = self
+            .provider
+            .get_transaction_receipt(tx_hash)
+            .await
+            .ok()??;
+        (receipt.transaction_hash() == tx_hash).then_some(receipt)
+    }
+
     #[allow(clippy::too_many_arguments)]
     pub(super) async fn broadcast_transaction(
         &self,
@@ -373,13 +389,35 @@ where
             // is mined/pre-confirmed and returns the full receipt, avoiding the
             // client-side polling loop of send_raw_transaction + get_receipt.
             let raw_hex = alloy::hex::encode_prefixed(&final_tx_bytes);
-            let receipt: <TempoNetwork as alloy::network::Network>::ReceiptResponse = self
-                .provider
-                .raw_request("eth_sendRawTransactionSync".into(), [raw_hex])
-                .await
-                .map_err(|e| {
-                    VerificationError::network_error(format!("Failed to broadcast: {}", e))
-                })?;
+            let broadcast: Result<<TempoNetwork as alloy::network::Network>::ReceiptResponse, _> =
+                self.provider
+                    .raw_request("eth_sendRawTransactionSync".into(), [raw_hex])
+                    .await;
+            let receipt = match broadcast {
+                Ok(receipt) => receipt,
+                Err(broadcast_error) => {
+                    // The node may have included the transaction before its
+                    // reply failed. Recover only when the store reserved this
+                    // submission above: without a store, a receipt for these
+                    // bytes may belong to an earlier, already accepted
+                    // submission of the same credential. An unrecovered
+                    // broadcast releases the reservation below, so a retry of
+                    // the same bytes can reach recovery once the transaction
+                    // lands; the replay claim still prevents double acceptance.
+                    let recovered = match &submission_key {
+                        Some(_) => {
+                            self.recover_broadcast_receipt(keccak256(&final_tx_bytes))
+                                .await
+                        }
+                        None => None,
+                    };
+                    recovered.ok_or_else(|| {
+                        VerificationError::network_error(format!(
+                            "Failed to broadcast: {broadcast_error}"
+                        ))
+                    })?
+                }
+            };
 
             if !receipt.status() {
                 return Err(VerificationError::transaction_failed(format!(
